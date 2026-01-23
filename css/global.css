@@ -1,1 +1,64 @@
-    
+    :root {
+    --bg-dark: #211C29;       /* Color Menú */
+    --bg-light: #796696;      /* Color Fondo Principal */
+    --glass: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --text-white: #ffffff;
+    --primary-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-light);
+    background-image: linear-gradient(160deg, #211C29 0%, #796696 100%);
+    min-height: 100vh;
+    color: var(--text-white);
+    display: flex;
+    flex-direction: column;
+}
+
+/* === EFECTO VIDRIO (GLASSMORPHISM) === */
+.glass-container {
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    padding: 2rem;
+}
+
+/* === BOTONES DIFUMINADOS === */
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: #211C29;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* === INPUTS === */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.2);
+    color: white;
+    outline: none;
+}

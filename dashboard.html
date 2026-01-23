@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - RFID</title>
+    <link rel="stylesheet" href="./css/global.css">
+    <style>
+        .layout { display: flex; height: 100vh; }
+        
+        /* SIDEBAR (MENÚ) */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-dark);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar h3 { margin-bottom: 30px; text-align: center; color: #a18cd1; }
+        .menu-item {
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: 0.3s;
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.1); }
+        .menu-item.active { background: var(--bg-light); }
+
+        /* CONTENIDO PRINCIPAL */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* TABLA */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(0,0,0,0.2); }
+        
+        /* MODAL */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout">
+        <div class="sidebar">
+            <h3>🛡️ SUPER ADMIN</h3>
+            <div class="menu-item active">👥 Gestión Usuarios</div>
+            <div class="menu-item" onclick="alert('Próximamente')">📊 Reportes</div>
+            <div class="menu-item" style="margin-top: auto; color: #ff6b6b;" onclick="logout()">🚪 Salir</div>
+        </div>
+
+        <div class="main-content">
+            <h1>Lista de Usuarios</h1>
+            <div class="glass-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Rol Actual</th>
+                            <th>Tarjeta (UID)</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaUsuarios">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEditar" class="modal">
+        <div class="glass-container" style="width: 400px; background: #2a2435;">
+            <h3>✏️ Asignar Rol y Tarjeta</h3>
+            <input type="hidden" id="editId">
+            
+            <label>Rol de Usuario:</label>
+            <select id="editRol">
+                <option value="ROLE_ESTUDIANTE">Estudiante</option>
+                <option value="ROLE_ADMIN_BAR">Admin Bar</option>
+                <option value="ROLE_ADMIN_BIBLIOTECA">Admin Biblioteca</option>
+                <option value="ROLE_ADMIN">Super Admin</option>
+            </select>
+
+            <label>Código Tarjeta RFID:</label>
+            <input type="text" id="editRfid" placeholder="Ej: A3-B4-C2-D1">
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn-primary" onclick="guardarCambios()">Guardar</button>
+                <button class="btn-primary" style="background: #ff6b6b; color: white;" onclick="cerrarModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8080/api";
+        const token = localStorage.getItem('jwt_token');
+
+        // 1. CARGAR USUARIOS AL INICIAR
+        async function cargarUsuarios() {
+            if (!token) window.location.href = 'index.html';
+
+            const res = await fetch(`${API_URL}/usuarios`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const usuarios = await res.json();
+            
+            const tbody = document.getElementById('tablaUsuarios');
+            tbody.innerHTML = '';
+
+            usuarios.forEach(u => {
+                // Si la tarjeta es null, ponemos "Sin asignar"
+                const tarjetaUid = u.tarjeta ? u.tarjeta.uid : "⚠️ Sin Asignar"; 
+                // Ojo: ajusta u.tarjeta.uid según como venga tu JSON del backend
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${u.id}</td>
+                        <td>${u.email}</td>
+                        <td><span style="background:#a18cd1; color:black; padding:2px 6px; border-radius:4px; font-size:12px">${u.rolNombre || u.rol?.nombre || "N/A"}</span></td>
+                        <td>${tarjetaUid}</td>
+                        <td>
+                            <button class="btn-primary" style="padding: 5px 10px; font-size: 12px;" 
+                                onclick="abrirModal(${u.id})">Editar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 2. ABRIR MODAL
+        function abrirModal(id) {
+            document.getElementById('editId').value = id;
+            document.getElementById('modalEditar').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalEditar').style.display = 'none';
+        }
+
+        // 3. GUARDAR CAMBIOS (Conecta con tu Backend)
+        async function guardarCambios() {
+            const id = document.getElementById('editId').value;
+            const rol = document.getElementById('editRol').value;
+            const tarjetaUid = document.getElementById('editRfid').value;
+
+            try {
+                const res = await fetch(`${API_URL}/usuarios/${id}/asignar-datos`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ 
+                        rol: rol, 
+                        tarjetaUid: tarjetaUid 
+                    })
+                });
+
+                if (res.ok) {
+                    alert('Usuario actualizado correctamente');
+                    cerrarModal();
+                    cargarUsuarios(); // Recargar tabla
+                } else {
+                    alert('Error al actualizar');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error de conexión');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('jwt_token');
+            window.location.href = 'index.html';
+        }
+
+        // Iniciar
+        cargarUsuarios();
+    </script>
+</body>
+</html>

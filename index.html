@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RFID Campus</title>
+    <link rel="stylesheet" href="./css/global.css">
+    <style>
+        .login-wrapper {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-wrapper">
+        <div class="glass-container login-box">
+            <h2> Iniciar Sesión</h2>
+            <p style="opacity: 0.8; margin-bottom: 20px;">Sistema DUI Universitario</p>
+            
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Correo Institucional" required>
+                <input type="password" id="password" placeholder="Contraseña" required>
+                
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">
+                    ENTRAR
+                </button>
+            </form>
+            <p id="errorMsg" style="color: #ff6b6b; margin-top: 10px; display: none;"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            try {
+                // LLAMADA AL BACKEND
+                const response = await fetch('http://localhost:8080/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Guardamos el Token
+                    localStorage.setItem('jwt_token', data.token);
+                    window.location.href = 'dashboard.html'; // Redirige al Dashboard
+                } else {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = "Error: Credenciales incorrectas";
+                }
+            } catch (error) {
+                console.error(error);
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = "Error de conexión con el servidor";
+            }
+        });
+    </script>
+</body>
+</html>
