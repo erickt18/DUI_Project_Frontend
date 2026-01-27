@@ -12,7 +12,7 @@ async function peticionAutenticada(endpoint, metodo = 'GET', cuerpo = null) {
     const token = localStorage.getItem('jwt_token');
 
     if (!token) {
-        alert("⚠️ No tienes sesión iniciada. Volviendo al login...");
+        alert(" No tienes sesión iniciada. Volviendo al login...");
         window.location.href = '/index.html';
         return;
     }
@@ -22,7 +22,7 @@ async function peticionAutenticada(endpoint, metodo = 'GET', cuerpo = null) {
         method: metodo,
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // <--- ¡AQUÍ ESTÁ LA MAGIA! 🔗
+            'Authorization': `Bearer ${token}` 
         }
     };
 
@@ -37,7 +37,7 @@ async function peticionAutenticada(endpoint, metodo = 'GET', cuerpo = null) {
         
         // Si el token venció o es falso (Error 403/401)
         if (respuesta.status === 401 || respuesta.status === 403) {
-            alert("⛔ Tu sesión expiró o no tienes permiso.");
+            alert(" Tu sesión expiró o no tienes permiso.");
             localStorage.removeItem('jwt_token'); // Borramos el token malo
             window.location.href = '/index.html';
             return null;
@@ -54,7 +54,7 @@ async function peticionAutenticada(endpoint, metodo = 'GET', cuerpo = null) {
 
     } catch (error) {
         console.error("Error de conexión:", error);
-        alert("❌ Error: " + error.message);
+        alert(" Error: " + error.message);
         return null;
     }
 }
