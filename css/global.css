@@ -1,64 +1,141 @@
-    :root {
+:root {
     --bg-dark: #211C29;       /* Color Menú */
     --bg-light: #796696;      /* Color Fondo Principal */
-    --glass: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
+    --primary: #9b7ec4;
     --text-white: #ffffff;
-    --primary-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+    --glass: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.2);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
 body {
     background-color: var(--bg-light);
-    background-image: linear-gradient(160deg, #211C29 0%, #796696 100%);
+    color: #333;
     min-height: 100vh;
-    color: var(--text-white);
+    display: flex;
+}
+
+/* === ESTILOS LOGIN Y REGISTER (Split Screen) === */
+.auth-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background: var(--bg-dark);
+}
+
+.auth-left {
+    flex: 1;
+    background: linear-gradient(135deg, #211C29 0%, #4a3b5e 100%);
     display: flex;
     flex-direction: column;
-}
-
-/* === EFECTO VIDRIO (GLASSMORPHISM) === */
-.glass-container {
-    background: var(--glass);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-    padding: 2rem;
-}
-
-/* === BOTONES DIFUMINADOS === */
-.btn-primary {
-    background: var(--primary-gradient);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    color: #211C29;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-
-/* === INPUTS === */
-input, select {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.3);
-    background: rgba(0,0,0,0.2);
+    justify-content: center;
+    padding: 60px;
     color: white;
-    outline: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-left::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: url('https://img.freepik.com/free-vector/gradient-network-connection-background_23-2148879890.jpg'); /* Fondo abstracto opcional */
+    opacity: 0.1;
+    animation: moveBackground 20s linear infinite;
+}
+
+.auth-right {
+    width: 500px;
+    background: var(--glass);
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+}
+
+.auth-title { font-size: 2.5rem; margin-bottom: 10px; color: var(--bg-dark); }
+.auth-subtitle { color: #666; margin-bottom: 30px; }
+
+/* Inputs Modernos */
+.input-group { margin-bottom: 20px; position: relative; }
+.input-group label { display: block; margin-bottom: 8px; color: #555; font-size: 0.9rem; }
+.auth-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    background: #f9f9f9;
+    transition: 0.3s;
+}
+.auth-input:focus { border-color: var(--primary); background: #fff; outline: none; }
+
+/* Botones */
+.btn-auth {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(to right, #796696, #211C29);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.btn-auth:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(121, 102, 150, 0.4); }
+
+.auth-link { text-align: center; margin-top: 20px; font-size: 0.9rem; }
+.auth-link a { color: var(--primary); text-decoration: none; font-weight: bold; }
+
+/* === ESTILOS DASHBOARD (Tu estructura) === */
+.sidebar {
+    position: fixed; left: 0; top: 0; height: 100vh; width: 260px;
+    background: var(--bg-dark); padding: 20px 0; overflow-y: auto; z-index: 100;
+    transition: all 0.3s ease;
+}
+.sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+.sidebar-header h2 { color: #fff; font-size: 20px; }
+.sidebar-header p { color: #b0a3c1; font-size: 12px; }
+
+.menu-link {
+    display: flex; align-items: center; padding: 12px 20px; color: #b0a3c1;
+    text-decoration: none; transition: 0.3s; cursor: pointer;
+}
+.menu-link:hover, .menu-link.active { background: rgba(121, 102, 150, 0.2); color: #fff; border-left: 4px solid var(--primary); }
+.menu-link i { width: 24px; margin-right: 10px; }
+.submenu { max-height: 0; overflow: hidden; transition: 0.3s; background: rgba(0,0,0,0.3); }
+.submenu.show { max-height: 200px; }
+.submenu-link { display: block; padding: 10px 20px 10px 54px; color: #999; text-decoration: none; font-size: 14px; }
+.submenu-link:hover { color: white; }
+
+/* Main Content Dashboard */
+.main-content { margin-left: 260px; width: 100%; background: #f4f6f9; min-height: 100vh; }
+.navbar { background: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+/* User Dropdown */
+.user-dropdown {
+    position: absolute; top: 60px; right: 30px; background: #fff;
+    border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    width: 250px; display: none; z-index: 1000;
+}
+.user-dropdown.show { display: block; }
+.user-dropdown-header { background: var(--primary); padding: 15px; color: white; border-radius: 12px 12px 0 0; }
+
+/* Sections & Cards */
+.page-section { display: none; padding: 30px; }
+.page-section.active { display: block; }
+.card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.stat-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 4px solid var(--primary); }
+.stat-value { font-size: 24px; font-weight: bold; color: var(--bg-dark); }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .auth-left { display: none; }
+    .auth-right { width: 100%; }
+    .sidebar { transform: translateX(-260px); }
+    .main-content { margin-left: 0; }
 }
