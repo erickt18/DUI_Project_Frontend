@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Bar - RFID Campus</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/bar.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <h3><i class="fas fa-coffee"></i> ADMIN BAR</h3>
+
+        <div class="menu-item active" onclick="cambiarVista('dashboard', this)">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </div>
+        <div class="menu-item" onclick="cambiarVista('productos', this)">
+          <i class="fas fa-box"></i> Productos
+        </div>
+        <div class="menu-item" onclick="cambiarVista('finanzas', this)">
+          <i class="fas fa-dollar-sign"></i> Finanzas
+        </div>
+        <div class="menu-item" onclick="cambiarVista('transacciones', this)">
+          <i class="fas fa-receipt"></i> Transacciones
+        </div>
+        <div class="menu-item" onclick="cambiarVista('reportes', this)">
+          <i class="fas fa-chart-bar"></i> Reportes
+        </div>
+
+        <div
+          class="menu-item"
+          style="margin-top: auto; color: #ff6b6b"
+          onclick="logout()"
+        >
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- VISTA: DASHBOARD -->
+        <div id="view-dashboard" class="view-section active">
+          <div class="header-dash">
+            <h1>Dashboard Principal</h1>
+            <button class="btn-primary" onclick="cargarDashboard()">
+              <i class="fas fa-sync-alt"></i> Refrescar
+            </button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <i class="fas fa-box icon"></i>
+              <h4>Total Productos</h4>
+              <div class="number" id="stat-productos">--</div>
+            </div>
+
+            <div class="stat-card">
+              <i class="fas fa-dollar-sign icon"></i>
+              <h4>Ventas del Mes</h4>
+              <div class="number" id="stat-ventas">--</div>
+            </div>
+
+            <div class="stat-card">
+              <i class="fas fa-users icon"></i>
+              <h4>Clientes Activos</h4>
+              <div class="number" id="stat-clientes">--</div>
+            </div>
+
+            <div class="stat-card">
+              <i class="fas fa-shopping-cart icon"></i>
+              <h4>Transacciones Hoy</h4>
+              <div class="number" id="stat-transacciones">--</div>
+            </div>
+          </div>
+
+          <div class="glass-table-container">
+            <h3 style="margin-bottom: 20px; color: var(--bg-dark)">
+              Actividad Reciente
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th>Usuario</th>
+                  <th>Monto</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-actividad">
+                <tr>
+                  <td colspan="4" style="text-align: center; padding: 20px">
+                    Cargando...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- OTRAS VISTAS -->
+        <div id="view-productos" class="view-section">
+          <div class="header-dash">
+            <h1>Gestión de Productos</h1>
+            <button class="btn-primary" onclick="abrirModalProducto()">
+              <i class="fas fa-plus"></i> Nuevo Producto
+            </button>
+          </div>
+
+          <!-- Barra de búsqueda -->
+          <div
+            class="glass-table-container"
+            style="margin-bottom: 20px; padding: 15px"
+          >
+            <div style="display: flex; gap: 15px; align-items: center">
+              <div style="flex: 1; position: relative">
+                <i
+                  class="fas fa-search"
+                  style="
+                    position: absolute;
+                    left: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #999;
+                  "
+                ></i>
+                <input
+                  type="text"
+                  id="buscarProducto"
+                  placeholder="Buscar por nombre, categoría o precio..."
+                  style="
+                    width: 100%;
+                    padding: 12px 12px 12px 45px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 14px;
+                  "
+                  oninput="buscarProductos()"
+                />
+              </div>
+              <select
+                id="filtroCategoria"
+                onchange="buscarProductos()"
+                style="
+                  padding: 12px;
+                  border: 1px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  min-width: 200px;
+                "
+              >
+                <option value="">Todas las categorías</option>
+                <option value="Bebidas">Bebidas</option>
+                <option value="Comidas">Comidas</option>
+                <option value="Snacks">Snacks</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tabla de productos -->
+          <div class="glass-table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Descripción</th>
+                  <th>Precio</th>
+                  <th>Stock</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-productos">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 20px">
+                    Cargando productos...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="view-finanzas" class="view-section">
+          <h1>Finanzas</h1>
+          <p style="color: #666">En desarrollo...</p>
+        </div>
+
+        <div id="view-transacciones" class="view-section">
+          <h1>Historial de Transacciones</h1>
+          <p style="color: #666">En desarrollo...</p>
+        </div>
+
+        <div id="view-reportes" class="view-section">
+          <h1>Reportes Mensuales</h1>
+          <p style="color: #666">En desarrollo...</p>
+        </div>
+      </div>
+      <!-- MODAL: CREAR/EDITAR PRODUCTO -->
+      <div
+        id="modal-producto"
+        style="
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.7);
+          z-index: 1000;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <div
+          style="
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 25px;
+            "
+          >
+            <h2 style="color: var(--bg-dark); margin: 0" id="modal-titulo">
+              Nuevo Producto
+            </h2>
+            <button
+              onclick="cerrarModalProducto()"
+              style="
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #666;
+              "
+            >
+              &times;
+            </button>
+          </div>
+
+          <form id="form-producto" onsubmit="guardarProducto(event)">
+            <input type="hidden" id="producto-id" />
+
+            <div style="margin-bottom: 20px">
+              <label
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                  color: #333;
+                "
+                >Nombre del Producto</label
+              >
+              <input
+                type="text"
+                id="producto-nombre"
+                required
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  border: 1px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                "
+              />
+            </div>
+
+            <div style="margin-bottom: 20px">
+              <label
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                  color: #333;
+                "
+                >Descripción</label
+              >
+              <textarea
+                id="producto-descripcion"
+                rows="3"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  border: 1px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  resize: vertical;
+                "
+              ></textarea>
+            </div>
+
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-bottom: 20px;
+              "
+            >
+              <div>
+                <label
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #333;
+                  "
+                  >Precio ($)</label
+                >
+                <input
+                  type="number"
+                  id="producto-precio"
+                  step="0.01"
+                  min="0"
+                  required
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 14px;
+                  "
+                />
+              </div>
+              <div>
+                <label
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #333;
+                  "
+                  >Stock</label
+                >
+                <input
+                  type="number"
+                  id="producto-stock"
+                  min="0"
+                  required
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 14px;
+                  "
+                />
+              </div>
+            </div>
+
+            <div style="margin-bottom: 25px">
+              <label
+                style="display: flex; align-items: center; cursor: pointer"
+              >
+                <input
+                  type="checkbox"
+                  id="producto-activo"
+                  checked
+                  style="margin-right: 8px; width: 18px; height: 18px"
+                />
+                <span style="font-weight: 600; color: #333"
+                  >Producto Activo</span
+                >
+              </label>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end">
+              <button
+                type="button"
+                onclick="cerrarModalProducto()"
+                style="
+                  padding: 12px 24px;
+                  background: #e0e0e0;
+                  border: none;
+                  border-radius: 8px;
+                  cursor: pointer;
+                  font-weight: 600;
+                  color: #333;
+                "
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Guardar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript INLINE (directamente aquí) -->
+    <script>
+      console.log("🚀 JavaScript cargado");
+
+      // Configuración
+      const API_URL = "http://localhost:8080/api";
+      const token = localStorage.getItem("jwt_token");
+
+      // Verificar sesión
+      if (!token) {
+        alert("Sesión expirada");
+        window.location.href = "../index.html";
+      }
+
+      // ========== CAMBIAR VISTA ==========
+      function cambiarVista(vistaNombre, elementoMenu) {
+        console.log("Cambiando a:", vistaNombre);
+
+        document.querySelectorAll(".view-section").forEach((el) => {
+          el.classList.remove("active");
+        });
+
+        const vista = document.getElementById("view-" + vistaNombre);
+        if (vista) vista.classList.add("active");
+
+        document.querySelectorAll(".menu-item").forEach((el) => {
+          el.classList.remove("active");
+        });
+        if (elementoMenu) elementoMenu.classList.add("active");
+
+        // Cargar datos según la vista
+        if (vistaNombre === "dashboard") cargarDashboard();
+        if (vistaNombre === "productos") cargarProductos(); // 🆕 NUEVO
+      }
+
+      // ========== CARGAR DASHBOARD ==========
+      async function cargarDashboard() {
+        console.log("📊 Cargando dashboard...");
+
+        // Datos por defecto
+        document.getElementById("stat-productos").innerText = "24";
+        document.getElementById("stat-ventas").innerText = "$12,450";
+        document.getElementById("stat-clientes").innerText = "156";
+        document.getElementById("stat-transacciones").innerText = "89";
+
+        // Tabla demo
+        const tbody = document.getElementById("tabla-actividad");
+        tbody.innerHTML = `
+                <tr>
+                    <td>27/01/2026 14:30</td>
+                    <td><span class="badge bg-success">COMPRA_BAR</span></td>
+                    <td>estudiante@ude.edu.ec</td>
+                    <td style="font-weight: bold; color: #27ae60">$5.50</td>
+                </tr>
+                <tr>
+                    <td>27/01/2026 13:15</td>
+                    <td><span class="badge bg-warning">RECARGA</span></td>
+                    <td>maria.gomez@ude.edu.ec</td>
+                    <td style="font-weight: bold; color: #27ae60">$20.00</td>
+                </tr>
+                <tr>
+                    <td>27/01/2026 12:00</td>
+                    <td><span class="badge bg-success">COMPRA_BAR</span></td>
+                    <td>carlos.ruiz@ude.edu.ec</td>
+                    <td style="font-weight: bold; color: #27ae60">$8.75</td>
+                </tr>
+                <tr>
+                    <td>27/01/2026 11:45</td>
+                    <td><span class="badge bg-warning">RECARGA</span></td>
+                    <td>ana.lopez@ude.edu.ec</td>
+                    <td style="font-weight: bold; color: #27ae60">$15.00</td>
+                </tr>
+                <tr>
+                    <td>27/01/2026 10:30</td>
+                    <td><span class="badge bg-success">COMPRA_BAR</span></td>
+                    <td>pedro.martinez@ude.edu.ec</td>
+                    <td style="font-weight: bold; color: #27ae60">$3.25</td>
+                </tr>
+            `;
+
+        // Intentar datos reales
+        try {
+          const res = await fetch(`${API_URL}/dashboard/info`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (res.ok) {
+            const stats = await res.json();
+            console.log("✅ Datos del backend:", stats);
+
+            document.getElementById("stat-productos").innerText =
+              stats.totalProductos || "24";
+            document.getElementById("stat-ventas").innerText =
+              "$" + (stats.totalSaldo || 12450).toFixed(2);
+            document.getElementById("stat-clientes").innerText =
+              stats.totalEstudiantes || "156";
+            document.getElementById("stat-transacciones").innerText =
+              stats.totalTransacciones || "89";
+          }
+        } catch (error) {
+          console.log("⚠️ Backend no disponible, mostrando datos demo");
+        }
+      }
+
+      // ========== LOGOUT ==========
+      function logout() {
+        if (confirm("¿Cerrar sesión?")) {
+          localStorage.removeItem("jwt_token");
+          window.location.href = "../index.html";
+        }
+      }
+
+      // ========== INICIALIZAR ==========
+      window.addEventListener("DOMContentLoaded", function () {
+        console.log("✅ Página lista");
+        cargarDashboard();
+      });
+
+      // Por si el DOM ya está listo
+      if (document.readyState !== "loading") {
+        cargarDashboard();
+      }
+      // ========== GESTIÓN DE PRODUCTOS ==========
+
+      // Variable global para almacenar productos
+      let productosData = [];
+
+      // Cargar productos desde el backend
+      async function cargarProductos() {
+        console.log("📦 Cargando productos...");
+
+        try {
+          const res = await fetch(`${API_URL}/productos`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (res.ok) {
+            productosData = await res.json();
+            console.log("✅ Productos cargados:", productosData);
+            mostrarProductos(productosData);
+          } else {
+            console.error("❌ Error al cargar productos");
+            mostrarProductosDemo();
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          mostrarProductosDemo();
+        }
+      }
+
+      // Mostrar productos en la tabla
+      function mostrarProductos(productos) {
+        const tbody = document.getElementById("tabla-productos");
+
+        if (!productos || productos.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="7" style="text-align:center; padding: 30px; color: #999;">No hay productos registrados</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = productos
+          .map(
+            (p) => `
+        <tr>
+            <td>#${p.id}</td>
+            <td style="font-weight: 600;">${p.nombre}</td>
+            <td style="color: #666; font-size: 13px;">${p.descripcion || "Sin descripción"}</td>
+            <td style="font-weight: bold; color: var(--primary);">$${parseFloat(p.precio).toFixed(2)}</td>
+            <td>
+                <span style="padding: 4px 12px; background: ${p.stock > 10 ? "#d4edda" : p.stock > 0 ? "#fff3cd" : "#f8d7da"}; 
+                             color: ${p.stock > 10 ? "#155724" : p.stock > 0 ? "#856404" : "#721c24"}; 
+                             border-radius: 12px; font-size: 12px; font-weight: bold;">
+                    ${p.stock} unidades
+                </span>
+            </td>
+            <td>
+                <span class="badge ${p.activo ? "bg-success" : "bg-danger"}">
+                    ${p.activo ? "Activo" : "Inactivo"}
+                </span>
+            </td>
+            <td>
+                <button class="btn-action" onclick="editarProducto(${p.id})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-action" onclick="eliminarProducto(${p.id})" title="Eliminar" 
+                        style="background: rgba(231, 76, 60, 0.1); color: #e74c3c;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `,
+          )
+          .join("");
+      }
+
+      // Productos demo (si falla el backend)
+      function mostrarProductosDemo() {
+        const demo = [
+          {
+            id: 1,
+            nombre: "Café Americano",
+            descripcion: "Café negro tradicional",
+            precio: 1.5,
+            stock: 50,
+            activo: true,
+          },
+          {
+            id: 2,
+            nombre: "Hamburguesa Clásica",
+            descripcion: "Con queso y vegetales",
+            precio: 4.5,
+            stock: 25,
+            activo: true,
+          },
+          {
+            id: 3,
+            nombre: "Jugo de Naranja",
+            descripcion: "Natural 100%",
+            precio: 2.0,
+            stock: 5,
+            activo: true,
+          },
+        ];
+        productosData = demo;
+        mostrarProductos(demo);
+      }
+
+      // Buscar/filtrar productos
+      function buscarProductos() {
+        const busqueda = document
+          .getElementById("buscarProducto")
+          .value.toLowerCase();
+        const categoria = document.getElementById("filtroCategoria").value;
+
+        let productosFiltrados = productosData;
+
+        // Filtrar por búsqueda
+        if (busqueda) {
+          productosFiltrados = productosFiltrados.filter(
+            (p) =>
+              p.nombre.toLowerCase().includes(busqueda) ||
+              (p.descripcion &&
+                p.descripcion.toLowerCase().includes(busqueda)) ||
+              p.precio.toString().includes(busqueda),
+          );
+        }
+
+        // Filtrar por categoría (si tu backend lo soporta)
+        if (categoria) {
+          productosFiltrados = productosFiltrados.filter(
+            (p) =>
+              p.categoria &&
+              p.categoria.toLowerCase() === categoria.toLowerCase(),
+          );
+        }
+
+        mostrarProductos(productosFiltrados);
+      }
+
+      // Abrir modal para crear producto
+      function abrirModalProducto() {
+        document.getElementById("modal-titulo").textContent = "Nuevo Producto";
+        document.getElementById("form-producto").reset();
+        document.getElementById("producto-id").value = "";
+        document.getElementById("producto-activo").checked = true;
+        document.getElementById("modal-producto").style.display = "flex";
+      }
+
+      // Cerrar modal
+      function cerrarModalProducto() {
+        document.getElementById("modal-producto").style.display = "none";
+      }
+
+      // Editar producto
+      function editarProducto(id) {
+        const producto = productosData.find((p) => p.id === id);
+        if (!producto) return;
+
+        document.getElementById("modal-titulo").textContent = "Editar Producto";
+        document.getElementById("producto-id").value = producto.id;
+        document.getElementById("producto-nombre").value = producto.nombre;
+        document.getElementById("producto-descripcion").value =
+          producto.descripcion || "";
+        document.getElementById("producto-precio").value = producto.precio;
+        document.getElementById("producto-stock").value = producto.stock;
+        document.getElementById("producto-activo").checked = producto.activo;
+        document.getElementById("modal-producto").style.display = "flex";
+      }
+
+      // Guardar producto (crear o editar)
+      async function guardarProducto(event) {
+        event.preventDefault();
+
+        const id = document.getElementById("producto-id").value;
+        const datos = {
+          nombre: document.getElementById("producto-nombre").value,
+          descripcion:
+            document.getElementById("producto-descripcion").value || null,
+          precio: parseFloat(document.getElementById("producto-precio").value),
+          stock: parseInt(document.getElementById("producto-stock").value),
+          activo: document.getElementById("producto-activo").checked,
+        };
+
+        try {
+          const url = id
+            ? `${API_URL}/productos/${id}`
+            : `${API_URL}/productos`;
+          const method = id ? "PUT" : "POST";
+
+          const res = await fetch(url, {
+            method: method,
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(datos),
+          });
+
+          if (res.ok) {
+            alert(id ? "✅ Producto actualizado" : "✅ Producto creado");
+            cerrarModalProducto();
+            cargarProductos();
+          } else {
+            const error = await res.json();
+            alert("❌ Error: " + (error.message || "No se pudo guardar"));
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("❌ Error de conexión");
+        }
+      }
+
+      // Eliminar producto
+      async function eliminarProducto(id) {
+        if (!confirm("¿Estás seguro de eliminar este producto?")) return;
+
+        try {
+          const res = await fetch(`${API_URL}/productos/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.ok) {
+            alert("✅ Producto eliminado");
+            cargarProductos();
+          } else {
+            alert("❌ Error al eliminar");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("❌ Error de conexión");
+        }
+      }
+    </script>
+  </body>
+</html>

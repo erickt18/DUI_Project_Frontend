@@ -1,0 +1,65 @@
+:root {
+    --bg-dark: #211C29;
+    --bg-light: #796696;
+    --primary: #9b7ec4;
+    --text-white: #ffffff;
+    --glass: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+body {
+    background-color: var(--bg-light);
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+}
+
+/* === ESTILOS LOGIN Y REGISTER === */
+.auth-container { display: flex; width: 100%; height: 100vh; background: var(--bg-dark); }
+
+.auth-left {
+    flex: 1; background: linear-gradient(135deg, #211C29 0%, #4a3b5e 100%);
+    display: flex; flex-direction: column; justify-content: center; padding: 60px;
+    color: white; position: relative; overflow: hidden;
+}
+
+.auth-left::before {
+    content: ''; position: absolute; width: 200%; height: 200%;
+    background: url('https://img.freepik.com/free-vector/gradient-network-connection-background_23-2148879890.jpg');
+    opacity: 0.1; animation: moveBackground 20s linear infinite;
+}
+
+.auth-right {
+    width: 500px; background: var(--glass); padding: 60px;
+    display: flex; flex-direction: column; justify-content: center;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+}
+
+.auth-title { font-size: 2.5rem; margin-bottom: 10px; color: var(--bg-dark); }
+.auth-subtitle { color: #666; margin-bottom: 30px; }
+
+.input-group { margin-bottom: 20px; position: relative; }
+.input-group label { display: block; margin-bottom: 8px; color: #555; font-size: 0.9rem; }
+.auth-input {
+    width: 100%; padding: 12px 15px; border: 2px solid #e1e1e1;
+    border-radius: 8px; background: #f9f9f9; transition: 0.3s;
+}
+.auth-input:focus { border-color: var(--primary); background: #fff; outline: none; }
+
+.btn-auth {
+    width: 100%; padding: 14px;
+    background: linear-gradient(to right, #796696, #211C29);
+    color: white; border: none; border-radius: 8px;
+    font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s;
+}
+.btn-auth:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(121, 102, 150, 0.4); }
+
+.auth-link { text-align: center; margin-top: 20px; font-size: 0.9rem; }
+.auth-link a { color: var(--primary); text-decoration: none; font-weight: bold; }
+
+@media (max-width: 768px) {
+    .auth-left { display: none; }
+    .auth-right { width: 100%; }
+}
