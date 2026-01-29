@@ -285,3 +285,34 @@ td:last-child {
         grid-template-columns: 1fr;
     }
 }
+/* Submenú desplegable */
+.submenu {
+    padding-left: 15px;
+    margin-top: 5px;
+}
+
+.submenu-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-size: 14px;
+    color: #bbb;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.submenu-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.submenu-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+.submenu-item i {
+    font-size: 14px;
+}

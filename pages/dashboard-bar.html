@@ -8,7 +8,9 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="../css/bar.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   </head>
   <body>
     <div class="layout">
@@ -22,9 +24,26 @@
         <div class="menu-item" onclick="cambiarVista('productos', this)">
           <i class="fas fa-box"></i> Productos
         </div>
-        <div class="menu-item" onclick="cambiarVista('finanzas', this)">
+
+        <div class="menu-item" onclick="toggleSubmenu('finanzas-submenu')">
           <i class="fas fa-dollar-sign"></i> Finanzas
+          <i
+            class="fas fa-chevron-down"
+            style="margin-left: auto; font-size: 12px"
+          ></i>
         </div>
+        <div id="finanzas-submenu" class="submenu" style="display: none">
+          <div
+            class="submenu-item"
+            onclick="cambiarVista('recargar-saldo', this)"
+          >
+            <i class="fas fa-wallet"></i> Recargar Saldo
+          </div>
+          <div class="submenu-item" onclick="cambiarVista('cobrar-rfid', this)">
+            <i class="fas fa-cash-register"></i> Cobrar con RFID
+          </div>
+        </div>
+
         <div class="menu-item" onclick="cambiarVista('transacciones', this)">
           <i class="fas fa-receipt"></i> Transacciones
         </div>
@@ -58,19 +77,16 @@
               <h4>Total Productos</h4>
               <div class="number" id="stat-productos">--</div>
             </div>
-
             <div class="stat-card">
               <i class="fas fa-dollar-sign icon"></i>
               <h4>Ventas del Mes</h4>
               <div class="number" id="stat-ventas">--</div>
             </div>
-
             <div class="stat-card">
               <i class="fas fa-users icon"></i>
               <h4>Clientes Activos</h4>
               <div class="number" id="stat-clientes">--</div>
             </div>
-
             <div class="stat-card">
               <i class="fas fa-shopping-cart icon"></i>
               <h4>Transacciones Hoy</h4>
@@ -102,7 +118,7 @@
           </div>
         </div>
 
-        <!-- OTRAS VISTAS -->
+        <!-- VISTA: PRODUCTOS -->
         <div id="view-productos" class="view-section">
           <div class="header-dash">
             <h1>Gestión de Productos</h1>
@@ -111,57 +127,37 @@
             </button>
           </div>
 
-          <!-- Barra de búsqueda -->
           <div
             class="glass-table-container"
             style="margin-bottom: 20px; padding: 15px"
           >
-            <div style="display: flex; gap: 15px; align-items: center">
-              <div style="flex: 1; position: relative">
-                <i
-                  class="fas fa-search"
-                  style="
-                    position: absolute;
-                    left: 15px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: #999;
-                  "
-                ></i>
-                <input
-                  type="text"
-                  id="buscarProducto"
-                  placeholder="Buscar por nombre, categoría o precio..."
-                  style="
-                    width: 100%;
-                    padding: 12px 12px 12px 45px;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    font-size: 14px;
-                  "
-                  oninput="buscarProductos()"
-                />
-              </div>
-              <select
-                id="filtroCategoria"
-                onchange="buscarProductos()"
+            <div style="position: relative">
+              <i
+                class="fas fa-search"
                 style="
-                  padding: 12px;
+                  position: absolute;
+                  left: 15px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  color: #999;
+                "
+              ></i>
+              <input
+                type="text"
+                id="buscarProducto"
+                placeholder="Buscar por ID, nombre, descripción o precio..."
+                style="
+                  width: 100%;
+                  padding: 12px 12px 12px 45px;
                   border: 1px solid #ddd;
                   border-radius: 8px;
                   font-size: 14px;
-                  min-width: 200px;
                 "
-              >
-                <option value="">Todas las categorías</option>
-                <option value="Bebidas">Bebidas</option>
-                <option value="Comidas">Comidas</option>
-                <option value="Snacks">Snacks</option>
-              </select>
+                oninput="buscarProductos()"
+              />
             </div>
           </div>
 
-          <!-- Tabla de productos -->
           <div class="glass-table-container">
             <table>
               <thead>
@@ -186,21 +182,952 @@
           </div>
         </div>
 
-        <div id="view-finanzas" class="view-section">
-          <h1>Finanzas</h1>
-          <p style="color: #666">En desarrollo...</p>
+        <!-- VISTA: RECARGAR SALDO (SIN MÉTODO DE PAGO) -->
+        <div id="view-recargar-saldo" class="view-section">
+          <div class="header-dash">
+            <h1><i class="fas fa-wallet"></i> Recargar Saldo</h1>
+            <p style="color: #666; margin-top: 10px">
+              Recarga saldo en tarjetas RFID
+            </p>
+          </div>
+
+          <div
+            class="glass-table-container"
+            style="max-width: 600px; margin: 0 auto"
+          >
+            <form id="form-recarga" onsubmit="procesarRecarga(event)">
+              <div style="margin-bottom: 20px">
+                <label
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #333;
+                  "
+                >
+                  ID de Usuario / RFID
+                </label>
+                <input
+                  type="text"
+                  id="recarga-uid"
+                  required
+                  placeholder="Ingrese ID de usuario o pase RFID"
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 14px;
+                  "
+                />
+              </div>
+
+              <div style="margin-bottom: 20px">
+                <label
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #333;
+                  "
+                >
+                  Monto a Recargar
+                </label>
+                <input
+                  type="number"
+                  id="recarga-monto"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  placeholder="0.00"
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 14px;
+                  "
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="btn-primary"
+                style="width: 100%; background: #27ae60"
+              >
+                <i class="fas fa-check-circle"></i> Procesar Recarga
+              </button>
+            </form>
+
+            <div
+              id="info-recarga"
+              style="
+                display: none;
+                margin-top: 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                border-left: 4px solid var(--primary);
+              "
+            >
+              <p style="margin: 5px 0; color: #333">
+                <strong>Usuario:</strong> <span id="recarga-usuario">--</span>
+              </p>
+              <p style="margin: 5px 0; color: #333">
+                <strong>Saldo Actual:</strong>
+                <span id="recarga-saldo-actual">$0.00</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="glass-table-container" style="margin-top: 30px">
+            <h3 style="margin-bottom: 20px; color: var(--bg-dark)">
+              <i class="fas fa-history"></i> Recargas de Hoy
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Hora</th>
+                  <th>Usuario</th>
+                  <th>Monto</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-recargas-hoy">
+                <tr>
+                  <td colspan="4" style="text-align: center; padding: 20px">
+                    No hay recargas hoy
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        <!-- VISTA: COBRAR CON RFID (SIN FILTRO DE CATEGORÍAS) -->
+        <div id="view-cobrar-rfid" class="view-section">
+          <div class="header-dash">
+            <h1><i class="fas fa-shopping-cart"></i> Realizar Compra</h1>
+          </div>
+
+          <div class="glass-table-container">
+            <!-- Sección: Escanear Tarjeta -->
+            <h3 style="margin-bottom: 15px">Escanea la Tarjeta RFID</h3>
+            <p style="font-size: 13px; color: #666; margin-bottom: 10px">
+              Escanea la tarjeta o escribe el UID y presiona Enter.
+            </p>
+
+            <input
+              type="text"
+              id="cobro-uid"
+              placeholder="Ejemplo: 5555555555"
+              style="
+                width: 100%;
+                padding: 14px;
+                border: 2px solid #ddd;
+                border-radius: 8px;
+                font-size: 16px;
+                margin-bottom: 20px;
+              "
+              oninput="verificarTarjetaCobro()"
+            />
+
+            <div
+              id="info-cobro"
+              style="
+                display: none;
+                margin-bottom: 20px;
+                padding: 15px;
+                background: #d4edda;
+                border-radius: 8px;
+                border-left: 4px solid #27ae60;
+              "
+            >
+              <p style="margin: 5px 0; color: #155724">
+                <strong>Usuario:</strong>
+                <span id="cobro-usuario">Verificando...</span>
+              </p>
+              <p style="margin: 5px 0; color: #155724">
+                <strong>Saldo:</strong> <span id="cobro-saldo">$--</span>
+              </p>
+            </div>
+
+            <!-- Sección: Seleccionar Productos (SIN FILTRO DE CATEGORÍAS) -->
+            <h3 style="margin: 25px 0 15px 0; color: var(--primary)">
+              Selecciona un producto
+            </h3>
+
+            <!-- Solo barra de búsqueda -->
+            <div style="position: relative; margin-bottom: 20px">
+              <i
+                class="fas fa-search"
+                style="
+                  position: absolute;
+                  left: 15px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  color: #999;
+                "
+              ></i>
+              <input
+                type="text"
+                id="buscar-producto-venta"
+                placeholder="Buscar producto..."
+                style="
+                  width: 100%;
+                  padding: 12px 12px 12px 45px;
+                  border: 1px solid #ddd;
+                  border-radius: 8px;
+                "
+                oninput="filtrarProductosVenta()"
+              />
+            </div>
+
+            <!-- Grid de productos -->
+            <div
+              id="grid-productos"
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 15px;
+                margin-bottom: 25px;
+              "
+            >
+              <p style="text-align: center; color: #999; padding: 20px">
+                Cargando productos...
+              </p>
+            </div>
+
+            <!-- Productos seleccionados -->
+            <h3 style="margin: 25px 0 15px 0">Productos seleccionados:</h3>
+            <div
+              id="carrito-productos"
+              style="
+                min-height: 100px;
+                max-height: 250px;
+                overflow-y: auto;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 15px;
+                background: #f8f9fa;
+                margin-bottom: 20px;
+              "
+            >
+              <!-- Aquí se llenarán los productos seleccionados -->
+            </div>
+
+            <!-- Resumen de totales -->
+            <div
+              style="
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  margin-bottom: 10px;
+                "
+              >
+                <span>Precio total</span>
+                <span style="font-weight: bold" id="precio-total">$ 0.00</span>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  margin-bottom: 15px;
+                "
+              >
+                <span>Saldo después</span>
+                <span
+                  style="font-weight: bold; color: #27ae60"
+                  id="saldo-despues"
+                  >$ 0.00</span
+                >
+              </div>
+              <hr
+                style="border: none; border-top: 1px solid #ddd; margin: 15px 0"
+              />
+              <button
+                onclick="procesarCobro()"
+                class="btn-primary"
+                style="
+                  width: 100%;
+                  background: #27ae60;
+                  padding: 15px;
+                  font-size: 16px;
+                "
+              >
+                <i class="fas fa-shopping-cart"></i> Comprar
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabla de ventas -->
+          <div class="glass-table-container" style="margin-top: 30px">
+            <h3 style="margin-bottom: 20px">
+              <i class="fas fa-history"></i> Ventas de Hoy
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Hora</th>
+                  <th>Usuario</th>
+                  <th>Productos</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-ventas-hoy">
+                <tr>
+                  <td colspan="4" style="text-align: center; padding: 20px">
+                    No hay ventas hoy
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VISTA: TRANSACCIONES -->
 
         <div id="view-transacciones" class="view-section">
-          <h1>Historial de Transacciones</h1>
-          <p style="color: #666">En desarrollo...</p>
+          <div class="header-dash">
+            <h1><i class="fas fa-receipt"></i> Historial de Transacciones</h1>
+            <button class="btn-primary" onclick="cargarTransacciones()">
+              <i class="fas fa-sync-alt"></i> Refrescar
+            </button>
+          </div>
+
+          <!-- Filtros y Búsqueda -->
+          <div
+            class="glass-table-container"
+            style="margin-bottom: 20px; padding: 20px"
+          >
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 2fr 1fr 1fr;
+                gap: 15px;
+                align-items: end;
+              "
+            >
+              <!-- Buscador -->
+              <div>
+                <label
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #333;
+                  "
+                >
+                  <i class="fas fa-search"></i> Buscar
+                </label>
+                <input
+                  type="text"
+                  id="buscar-transaccion"
+                  placeholder="Buscar por usuario, tipo o monto..."
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 14px;
+                  "
+                  oninput="filtrarTransacciones()"
+                />
+              </div>
+
+              <!-- Filtro por Tipo -->
+              <div>
+                <label
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #333;
+                  "
+                >
+                  <i class="fas fa-filter"></i> Tipo
+                </label>
+                <select
+                  id="filtro-tipo"
+                  onchange="filtrarTransacciones()"
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 14px;
+                  "
+                >
+                  <option value="">Todos</option>
+                  <option value="RECARGA">Recargas</option>
+                  <option value="COMPRA_BAR">Compras Bar</option>
+                  <option value="COMPRA">Compras</option>
+                </select>
+              </div>
+
+              <!-- Filtro por Fecha -->
+              <div>
+                <label
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #333;
+                  "
+                >
+                  <i class="fas fa-calendar"></i> Fecha
+                </label>
+                <select
+                  id="filtro-fecha"
+                  onchange="filtrarTransacciones()"
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 14px;
+                  "
+                >
+                  <option value="todas">Todas</option>
+                  <option value="hoy">Hoy</option>
+                  <option value="semana">Esta Semana</option>
+                  <option value="mes">Este Mes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estadísticas Rápidas -->
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              gap: 20px;
+              margin-bottom: 25px;
+            "
+          >
+            <div
+              style="
+                background: white;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  margin-bottom: 10px;
+                "
+              >
+                <div
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    background: #e8f5e9;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i
+                    class="fas fa-check-circle"
+                    style="color: #27ae60; font-size: 20px"
+                  ></i>
+                </div>
+                <span style="font-weight: 600; color: #666">Total</span>
+              </div>
+              <div
+                style="font-size: 24px; font-weight: bold; color: #333"
+                id="stat-total-transacciones"
+              >
+                0
+              </div>
+            </div>
+
+            <div
+              style="
+                background: white;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  margin-bottom: 10px;
+                "
+              >
+                <div
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    background: #fff3cd;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i
+                    class="fas fa-wallet"
+                    style="color: #f39c12; font-size: 20px"
+                  ></i>
+                </div>
+                <span style="font-weight: 600; color: #666">Recargas</span>
+              </div>
+              <div
+                style="font-size: 24px; font-weight: bold; color: #f39c12"
+                id="stat-recargas"
+              >
+                $0.00
+              </div>
+            </div>
+
+            <div
+              style="
+                background: white;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  margin-bottom: 10px;
+                "
+              >
+                <div
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    background: #e3f2fd;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i
+                    class="fas fa-shopping-cart"
+                    style="color: var(--primary); font-size: 20px"
+                  ></i>
+                </div>
+                <span style="font-weight: 600; color: #666">Compras</span>
+              </div>
+              <div
+                style="
+                  font-size: 24px;
+                  font-weight: bold;
+                  color: var(--primary);
+                "
+                id="stat-compras"
+              >
+                $0.00
+              </div>
+            </div>
+
+            <div
+              style="
+                background: white;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  margin-bottom: 10px;
+                "
+              >
+                <div
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    background: #f3e5f5;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i
+                    class="fas fa-chart-line"
+                    style="color: #9b59b6; font-size: 20px"
+                  ></i>
+                </div>
+                <span style="font-weight: 600; color: #666">Balance</span>
+              </div>
+              <div
+                style="font-size: 24px; font-weight: bold; color: #9b59b6"
+                id="stat-balance"
+              >
+                $0.00
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla de Transacciones -->
+          <div class="glass-table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>#ID</th>
+                  <th>Fecha y Hora</th>
+                  <th>Usuario</th>
+                  <th>Tipo</th>
+                  <th>Detalles</th>
+                  <th>Monto</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-transacciones">
+                <tr>
+                  <td
+                    colspan="6"
+                    style="text-align: center; padding: 30px; color: #999"
+                  >
+                    Cargando transacciones...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Paginación -->
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px;
+                border-top: 1px solid #e0e0e0;
+              "
+            >
+              <div style="color: #666; font-size: 14px" id="info-paginacion">
+                Mostrando 0 de 0 transacciones
+              </div>
+              <div style="display: flex; gap: 10px">
+                <button
+                  onclick="cambiarPagina(-1)"
+                  id="btn-anterior"
+                  class="btn-action"
+                  disabled
+                >
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span
+                  style="
+                    padding: 8px 16px;
+                    background: #f0f0f0;
+                    border-radius: 6px;
+                    font-weight: 600;
+                  "
+                  id="numero-pagina"
+                  >1</span
+                >
+                <button
+                  onclick="cambiarPagina(1)"
+                  id="btn-siguiente"
+                  class="btn-action"
+                >
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
+        <!-- VISTA: REPORTES -->
         <div id="view-reportes" class="view-section">
-          <h1>Reportes Mensuales</h1>
-          <p style="color: #666">En desarrollo...</p>
+          <div class="header-dash">
+            <h1><i class="fas fa-chart-bar"></i> Reportes Mensuales</h1>
+            <div style="display: flex; gap: 10px">
+              <select
+                id="selector-mes-reporte"
+                onchange="cargarReportes()"
+                style="
+                  padding: 10px 15px;
+                  border: 2px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                "
+              >
+                <option value="0">Enero</option>
+                <option value="1">Febrero</option>
+                <option value="2">Marzo</option>
+                <option value="3">Abril</option>
+                <option value="4">Mayo</option>
+                <option value="5">Junio</option>
+                <option value="6">Julio</option>
+                <option value="7">Agosto</option>
+                <option value="8">Septiembre</option>
+                <option value="9">Octubre</option>
+                <option value="10">Noviembre</option>
+                <option value="11">Diciembre</option>
+              </select>
+              <select
+                id="selector-anio-reporte"
+                onchange="cargarReportes()"
+                style="
+                  padding: 10px 15px;
+                  border: 2px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                "
+              >
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+              </select>
+              <button class="btn-primary" onclick="cargarReportes()">
+                <i class="fas fa-sync-alt"></i> Refrescar
+              </button>
+            </div>
+          </div>
+
+          <!-- Tarjetas de Resumen -->
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              gap: 20px;
+              margin-bottom: 30px;
+            "
+          >
+            <div
+              style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 25px;
+                border-radius: 16px;
+                color: white;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+              "
+            >
+              <div style="display: flex; align-items: center; gap: 15px">
+                <div
+                  style="
+                    width: 50px;
+                    height: 50px;
+                    background: rgba(255, 255, 255, 0.2);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i class="fas fa-dollar-sign" style="font-size: 24px"></i>
+                </div>
+                <div>
+                  <div
+                    style="font-size: 13px; opacity: 0.9; margin-bottom: 5px"
+                  >
+                    Ingresos Totales
+                  </div>
+                  <div
+                    style="font-size: 28px; font-weight: bold"
+                    id="reporte-ingresos"
+                  >
+                    $0.00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                padding: 25px;
+                border-radius: 16px;
+                color: white;
+                box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+              "
+            >
+              <div style="display: flex; align-items: center; gap: 15px">
+                <div
+                  style="
+                    width: 50px;
+                    height: 50px;
+                    background: rgba(255, 255, 255, 0.2);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i class="fas fa-shopping-cart" style="font-size: 24px"></i>
+                </div>
+                <div>
+                  <div
+                    style="font-size: 13px; opacity: 0.9; margin-bottom: 5px"
+                  >
+                    Ventas Totales
+                  </div>
+                  <div
+                    style="font-size: 28px; font-weight: bold"
+                    id="reporte-ventas"
+                  >
+                    $0.00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                padding: 25px;
+                border-radius: 16px;
+                color: white;
+                box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+              "
+            >
+              <div style="display: flex; align-items: center; gap: 15px">
+                <div
+                  style="
+                    width: 50px;
+                    height: 50px;
+                    background: rgba(255, 255, 255, 0.2);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i class="fas fa-receipt" style="font-size: 24px"></i>
+                </div>
+                <div>
+                  <div
+                    style="font-size: 13px; opacity: 0.9; margin-bottom: 5px"
+                  >
+                    Transacciones
+                  </div>
+                  <div
+                    style="font-size: 28px; font-weight: bold"
+                    id="reporte-transacciones"
+                  >
+                    0
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+                padding: 25px;
+                border-radius: 16px;
+                color: white;
+                box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+              "
+            >
+              <div style="display: flex; align-items: center; gap: 15px">
+                <div
+                  style="
+                    width: 50px;
+                    height: 50px;
+                    background: rgba(255, 255, 255, 0.2);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i class="fas fa-chart-line" style="font-size: 24px"></i>
+                </div>
+                <div>
+                  <div
+                    style="font-size: 13px; opacity: 0.9; margin-bottom: 5px"
+                  >
+                    Promedio Diario
+                  </div>
+                  <div
+                    style="font-size: 28px; font-weight: bold"
+                    id="reporte-promedio"
+                  >
+                    $0.00
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráficos -->
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 2fr 1fr;
+              gap: 25px;
+              margin-bottom: 25px;
+            "
+          >
+            <!-- Gráfico de Ventas por Día -->
+            <div class="glass-table-container" style="padding: 25px">
+              <h3 style="margin-bottom: 20px; color: var(--bg-dark)">
+                <i class="fas fa-chart-line"></i> Ventas Diarias del Mes
+              </h3>
+              <canvas id="grafico-ventas-diarias"></canvas>
+            </div>
+
+            <!-- Gráfico de Tipos de Transacción -->
+            <div class="glass-table-container" style="padding: 25px">
+              <h3 style="margin-bottom: 20px; color: var(--bg-dark)">
+                <i class="fas fa-chart-pie"></i> Tipos de Transacción
+              </h3>
+              <canvas id="grafico-tipos"></canvas>
+            </div>
+          </div>
+
+          <!-- Productos Más Vendidos -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px">
+            <div class="glass-table-container" style="padding: 25px">
+              <h3 style="margin-bottom: 20px; color: var(--bg-dark)">
+                <i class="fas fa-star"></i> Top 10 Productos Más Vendidos
+              </h3>
+              <div
+                id="top-productos"
+                style="max-height: 400px; overflow-y: auto"
+              >
+                <p style="text-align: center; color: #999; padding: 30px">
+                  Cargando...
+                </p>
+              </div>
+            </div>
+
+            <!-- Usuarios Más Activos -->
+            <div class="glass-table-container" style="padding: 25px">
+              <h3 style="margin-bottom: 20px; color: var(--bg-dark)">
+                <i class="fas fa-users"></i> Usuarios Más Activos
+              </h3>
+              <div
+                id="top-usuarios"
+                style="max-height: 400px; overflow-y: auto"
+              >
+                <p style="text-align: center; color: #999; padding: 30px">
+                  Cargando...
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
       <!-- MODAL: CREAR/EDITAR PRODUCTO -->
       <div
         id="modal-producto"
@@ -255,7 +1182,6 @@
 
           <form id="form-producto" onsubmit="guardarProducto(event)">
             <input type="hidden" id="producto-id" />
-
             <div style="margin-bottom: 20px">
               <label
                 style="
@@ -279,7 +1205,6 @@
                 "
               />
             </div>
-
             <div style="margin-bottom: 20px">
               <label
                 style="
@@ -303,7 +1228,6 @@
                 "
               ></textarea>
             </div>
-
             <div
               style="
                 display: grid;
@@ -362,7 +1286,6 @@
                 />
               </div>
             </div>
-
             <div style="margin-bottom: 25px">
               <label
                 style="display: flex; align-items: center; cursor: pointer"
@@ -378,7 +1301,6 @@
                 >
               </label>
             </div>
-
             <div style="display: flex; gap: 10px; justify-content: flex-end">
               <button
                 type="button"
@@ -404,114 +1326,171 @@
       </div>
     </div>
 
-    <!-- JavaScript INLINE (directamente aquí) -->
     <script>
       console.log("🚀 JavaScript cargado");
 
-      // Configuración
       const API_URL = "http://localhost:8080/api";
       const token = localStorage.getItem("jwt_token");
 
-      // Verificar sesión
       if (!token) {
         alert("Sesión expirada");
         window.location.href = "../index.html";
       }
 
-      // ========== CAMBIAR VISTA ==========
+      function toggleSubmenu(id) {
+        const submenu = document.getElementById(id);
+        submenu.style.display =
+          submenu.style.display === "none" ? "block" : "none";
+      }
+      // ================ CAMBIAR VISTA =================
       function cambiarVista(vistaNombre, elementoMenu) {
-        console.log("Cambiando a:", vistaNombre);
-
-        document.querySelectorAll(".view-section").forEach((el) => {
-          el.classList.remove("active");
-        });
-
+        document
+          .querySelectorAll(".view-section")
+          .forEach((el) => el.classList.remove("active"));
         const vista = document.getElementById("view-" + vistaNombre);
         if (vista) vista.classList.add("active");
 
-        document.querySelectorAll(".menu-item").forEach((el) => {
-          el.classList.remove("active");
-        });
+        document
+          .querySelectorAll(".menu-item, .submenu-item")
+          .forEach((el) => el.classList.remove("active"));
         if (elementoMenu) elementoMenu.classList.add("active");
 
         // Cargar datos según la vista
         if (vistaNombre === "dashboard") cargarDashboard();
-        if (vistaNombre === "productos") cargarProductos(); // 🆕 NUEVO
+        if (vistaNombre === "productos") cargarProductos();
+        if (vistaNombre === "recargar-saldo") cargarRecargasHoy();
+        if (vistaNombre === "cobrar-rfid") {
+          cargarProductosVenta();
+          cargarVentasHoy();
+        }
+        if (vistaNombre === "transacciones") cargarTransacciones();
+        if (vistaNombre === "reportes") {
+          // Establecer mes y año actual por defecto
+          const hoy = new Date();
+          document.getElementById("selector-mes-reporte").value =
+            hoy.getMonth();
+          document.getElementById("selector-anio-reporte").value =
+            hoy.getFullYear();
+          cargarReportes();
+        }
       }
 
-      // ========== CARGAR DASHBOARD ==========
+      // ========== CARGAR DASHBOARD (CORREGIDO) ==========
       async function cargarDashboard() {
         console.log("📊 Cargando dashboard...");
 
-        // Datos por defecto
-        document.getElementById("stat-productos").innerText = "24";
-        document.getElementById("stat-ventas").innerText = "$12,450";
-        document.getElementById("stat-clientes").innerText = "156";
-        document.getElementById("stat-transacciones").innerText = "89";
+        // Valores por defecto
+        document.getElementById("stat-productos").innerText = "3";
+        document.getElementById("stat-ventas").innerText = "$5.50";
+        document.getElementById("stat-clientes").innerText = "7";
+        document.getElementById("stat-transacciones").innerText = "3";
 
-        // Tabla demo
-        const tbody = document.getElementById("tabla-actividad");
-        tbody.innerHTML = `
-                <tr>
-                    <td>27/01/2026 14:30</td>
-                    <td><span class="badge bg-success">COMPRA_BAR</span></td>
-                    <td>estudiante@ude.edu.ec</td>
-                    <td style="font-weight: bold; color: #27ae60">$5.50</td>
-                </tr>
-                <tr>
-                    <td>27/01/2026 13:15</td>
-                    <td><span class="badge bg-warning">RECARGA</span></td>
-                    <td>maria.gomez@ude.edu.ec</td>
-                    <td style="font-weight: bold; color: #27ae60">$20.00</td>
-                </tr>
-                <tr>
-                    <td>27/01/2026 12:00</td>
-                    <td><span class="badge bg-success">COMPRA_BAR</span></td>
-                    <td>carlos.ruiz@ude.edu.ec</td>
-                    <td style="font-weight: bold; color: #27ae60">$8.75</td>
-                </tr>
-                <tr>
-                    <td>27/01/2026 11:45</td>
-                    <td><span class="badge bg-warning">RECARGA</span></td>
-                    <td>ana.lopez@ude.edu.ec</td>
-                    <td style="font-weight: bold; color: #27ae60">$15.00</td>
-                </tr>
-                <tr>
-                    <td>27/01/2026 10:30</td>
-                    <td><span class="badge bg-success">COMPRA_BAR</span></td>
-                    <td>pedro.martinez@ude.edu.ec</td>
-                    <td style="font-weight: bold; color: #27ae60">$3.25</td>
-                </tr>
-            `;
-
-        // Intentar datos reales
         try {
-          const res = await fetch(`${API_URL}/dashboard/info`, {
+          // 1. Cargar estadísticas
+          const resStats = await fetch(`${API_URL}/dashboard/info`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           });
 
-          if (res.ok) {
-            const stats = await res.json();
-            console.log("✅ Datos del backend:", stats);
-
+          if (resStats.ok) {
+            const stats = await resStats.json();
             document.getElementById("stat-productos").innerText =
-              stats.totalProductos || "24";
+              stats.totalProductos || "3";
             document.getElementById("stat-ventas").innerText =
-              "$" + (stats.totalSaldo || 12450).toFixed(2);
+              "$" + (stats.totalSaldo || 5.5).toFixed(2);
             document.getElementById("stat-clientes").innerText =
-              stats.totalEstudiantes || "156";
+              stats.totalEstudiantes || "7";
             document.getElementById("stat-transacciones").innerText =
-              stats.totalTransacciones || "89";
+              stats.totalTransacciones || "3";
+          }
+
+          // 2. Cargar actividad reciente (CORREGIDO)
+          const resActividad = await fetch(`${API_URL}/transacciones`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (resActividad.ok) {
+            const todasTransacciones = await resActividad.json();
+            console.log("✅ Transacciones recibidas:", todasTransacciones);
+
+            // Mostrar las últimas 5 transacciones
+            const recientes = todasTransacciones.slice(0, 5);
+            mostrarActividadDashboard(recientes);
+          } else {
+            console.log("⚠️ No se pudieron cargar transacciones");
+            mostrarActividadDemo();
           }
         } catch (error) {
-          console.log("⚠️ Backend no disponible, mostrando datos demo");
+          console.log("⚠️ Error:", error);
+          mostrarActividadDemo();
         }
       }
 
-      // ========== LOGOUT ==========
+      // Nueva función para mostrar actividad en el dashboard
+      function mostrarActividadDashboard(transacciones) {
+        const tbody = document.getElementById("tabla-actividad");
+
+        if (!transacciones || transacciones.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #999;">No hay actividad reciente</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = transacciones
+          .map((t) => {
+            const fecha = new Date(t.fecha).toLocaleString("es-EC", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            const tipo = t.tipo || "COMPRA_BAR";
+            const badge = tipo === "RECARGA" ? "bg-warning" : "bg-success";
+            const usuario =
+              t.usuario?.nombreCompleto || t.usuario?.email || "Usuario";
+            const monto = Math.abs(t.monto || 0).toFixed(2);
+
+            return `
+        <tr>
+          <td>${fecha}</td>
+          <td><span class="badge ${badge}">${tipo}</span></td>
+          <td>${usuario}</td>
+          <td style="font-weight: bold; color: ${tipo === "RECARGA" ? "#27ae60" : "var(--primary)"}">$${monto}</td>
+        </tr>
+      `;
+          })
+          .join("");
+      }
+
+      // Actividad demo para cuando falla el backend
+      function mostrarActividadDemo() {
+        const tbody = document.getElementById("tabla-actividad");
+        tbody.innerHTML = `
+      <tr>
+        <td>27/01/2026 14:30</td>
+        <td><span class="badge bg-success">COMPRA_BAR</span></td>
+        <td>estudiante@ude.edu.ec</td>
+        <td style="font-weight: bold; color: var(--primary)">$5.50</td>
+      </tr>
+      <tr>
+        <td>27/01/2026 13:15</td>
+        <td><span class="badge bg-warning">RECARGA</span></td>
+        <td>maria.gomez@ude.edu.ec</td>
+        <td style="font-weight: bold; color: #27ae60">$20.00</td>
+      </tr>
+      <tr>
+        <td>27/01/2026 12:00</td>
+        <td><span class="badge bg-success">COMPRA_BAR</span></td>
+        <td>carlos.ruiz@ude.edu.ec</td>
+        <td style="font-weight: bold; color: var(--primary)">$8.75</td>
+      </tr>
+    `;
+      }
+
       function logout() {
         if (confirm("¿Cerrar sesión?")) {
           localStorage.removeItem("jwt_token");
@@ -519,25 +1498,18 @@
         }
       }
 
-      // ========== INICIALIZAR ==========
       window.addEventListener("DOMContentLoaded", function () {
-        console.log("✅ Página lista");
         cargarDashboard();
       });
 
-      // Por si el DOM ya está listo
       if (document.readyState !== "loading") {
         cargarDashboard();
       }
-      // ========== GESTIÓN DE PRODUCTOS ==========
 
-      // Variable global para almacenar productos
+      // ========== PRODUCTOS ==========
       let productosData = [];
 
-      // Cargar productos desde el backend
       async function cargarProductos() {
-        console.log("📦 Cargando productos...");
-
         try {
           const res = await fetch(`${API_URL}/productos`, {
             headers: {
@@ -545,131 +1517,67 @@
               "Content-Type": "application/json",
             },
           });
-
           if (res.ok) {
             productosData = await res.json();
-            console.log("✅ Productos cargados:", productosData);
             mostrarProductos(productosData);
-          } else {
-            console.error("❌ Error al cargar productos");
-            mostrarProductosDemo();
           }
         } catch (error) {
           console.error("Error:", error);
-          mostrarProductosDemo();
         }
       }
 
-      // Mostrar productos en la tabla
       function mostrarProductos(productos) {
         const tbody = document.getElementById("tabla-productos");
-
         if (!productos || productos.length === 0) {
           tbody.innerHTML =
-            '<tr><td colspan="7" style="text-align:center; padding: 30px; color: #999;">No hay productos registrados</td></tr>';
+            '<tr><td colspan="7" style="text-align:center; padding: 30px;">No hay productos</td></tr>';
           return;
         }
 
         tbody.innerHTML = productos
           .map(
             (p) => `
-        <tr>
-            <td>#${p.id}</td>
-            <td style="font-weight: 600;">${p.nombre}</td>
-            <td style="color: #666; font-size: 13px;">${p.descripcion || "Sin descripción"}</td>
-            <td style="font-weight: bold; color: var(--primary);">$${parseFloat(p.precio).toFixed(2)}</td>
-            <td>
-                <span style="padding: 4px 12px; background: ${p.stock > 10 ? "#d4edda" : p.stock > 0 ? "#fff3cd" : "#f8d7da"}; 
-                             color: ${p.stock > 10 ? "#155724" : p.stock > 0 ? "#856404" : "#721c24"}; 
-                             border-radius: 12px; font-size: 12px; font-weight: bold;">
-                    ${p.stock} unidades
-                </span>
-            </td>
-            <td>
-                <span class="badge ${p.activo ? "bg-success" : "bg-danger"}">
-                    ${p.activo ? "Activo" : "Inactivo"}
-                </span>
-            </td>
-            <td>
-                <button class="btn-action" onclick="editarProducto(${p.id})" title="Editar">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-action" onclick="eliminarProducto(${p.id})" title="Eliminar" 
-                        style="background: rgba(231, 76, 60, 0.1); color: #e74c3c;">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>
+      <tr>
+        <td>#${p.id}</td>
+        <td style="font-weight: 600;">${p.nombre}</td>
+        <td style="color: #666; font-size: 13px;">${p.descripcion || "Sin descripción"}</td>
+        <td style="font-weight: bold; color: var(--primary);">$${parseFloat(p.precio).toFixed(2)}</td>
+        <td>
+          <span style="padding: 4px 12px; background: ${p.stock > 10 ? "#d4edda" : p.stock > 0 ? "#fff3cd" : "#f8d7da"}; 
+                       color: ${p.stock > 10 ? "#155724" : p.stock > 0 ? "#856404" : "#721c24"}; 
+                       border-radius: 12px; font-size: 12px; font-weight: bold;">
+            ${p.stock} unidades
+          </span>
+        </td>
+        <td><span class="badge ${p.activo !== false ? "bg-success" : "bg-danger"}">${p.activo !== false ? "Activo" : "Inactivo"}</span></td>
+        <td>
+          <button class="btn-action" onclick='editarProducto(${JSON.stringify(p).replace(/'/g, "&apos;")})' title="Editar"><i class="fas fa-edit"></i></button>
+          <button class="btn-action" onclick="eliminarProducto(${p.id})" title="Eliminar" style="background: rgba(231, 76, 60, 0.1); color: #e74c3c;"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>
     `,
           )
           .join("");
       }
 
-      // Productos demo (si falla el backend)
-      function mostrarProductosDemo() {
-        const demo = [
-          {
-            id: 1,
-            nombre: "Café Americano",
-            descripcion: "Café negro tradicional",
-            precio: 1.5,
-            stock: 50,
-            activo: true,
-          },
-          {
-            id: 2,
-            nombre: "Hamburguesa Clásica",
-            descripcion: "Con queso y vegetales",
-            precio: 4.5,
-            stock: 25,
-            activo: true,
-          },
-          {
-            id: 3,
-            nombre: "Jugo de Naranja",
-            descripcion: "Natural 100%",
-            precio: 2.0,
-            stock: 5,
-            activo: true,
-          },
-        ];
-        productosData = demo;
-        mostrarProductos(demo);
-      }
-
-      // Buscar/filtrar productos
       function buscarProductos() {
         const busqueda = document
           .getElementById("buscarProducto")
           .value.toLowerCase();
-        const categoria = document.getElementById("filtroCategoria").value;
-
-        let productosFiltrados = productosData;
-
-        // Filtrar por búsqueda
-        if (busqueda) {
-          productosFiltrados = productosFiltrados.filter(
-            (p) =>
-              p.nombre.toLowerCase().includes(busqueda) ||
-              (p.descripcion &&
-                p.descripcion.toLowerCase().includes(busqueda)) ||
-              p.precio.toString().includes(busqueda),
-          );
+        if (!busqueda) {
+          mostrarProductos(productosData);
+          return;
         }
-
-        // Filtrar por categoría (si tu backend lo soporta)
-        if (categoria) {
-          productosFiltrados = productosFiltrados.filter(
-            (p) =>
-              p.categoria &&
-              p.categoria.toLowerCase() === categoria.toLowerCase(),
-          );
-        }
-
-        mostrarProductos(productosFiltrados);
+        const filtrados = productosData.filter(
+          (p) =>
+            p.nombre.toLowerCase().includes(busqueda) ||
+            (p.descripcion && p.descripcion.toLowerCase().includes(busqueda)) ||
+            p.precio.toString().includes(busqueda) ||
+            p.id.toString().includes(busqueda),
+        );
+        mostrarProductos(filtrados);
       }
 
-      // Abrir modal para crear producto
       function abrirModalProducto() {
         document.getElementById("modal-titulo").textContent = "Nuevo Producto";
         document.getElementById("form-producto").reset();
@@ -678,16 +1586,11 @@
         document.getElementById("modal-producto").style.display = "flex";
       }
 
-      // Cerrar modal
       function cerrarModalProducto() {
         document.getElementById("modal-producto").style.display = "none";
       }
 
-      // Editar producto
-      function editarProducto(id) {
-        const producto = productosData.find((p) => p.id === id);
-        if (!producto) return;
-
+      function editarProducto(producto) {
         document.getElementById("modal-titulo").textContent = "Editar Producto";
         document.getElementById("producto-id").value = producto.id;
         document.getElementById("producto-nombre").value = producto.nombre;
@@ -695,19 +1598,18 @@
           producto.descripcion || "";
         document.getElementById("producto-precio").value = producto.precio;
         document.getElementById("producto-stock").value = producto.stock;
-        document.getElementById("producto-activo").checked = producto.activo;
+        document.getElementById("producto-activo").checked =
+          producto.activo !== false;
         document.getElementById("modal-producto").style.display = "flex";
       }
 
-      // Guardar producto (crear o editar)
       async function guardarProducto(event) {
         event.preventDefault();
-
         const id = document.getElementById("producto-id").value;
         const datos = {
           nombre: document.getElementById("producto-nombre").value,
           descripcion:
-            document.getElementById("producto-descripcion").value || null,
+            document.getElementById("producto-descripcion").value || "",
           precio: parseFloat(document.getElementById("producto-precio").value),
           stock: parseInt(document.getElementById("producto-stock").value),
           activo: document.getElementById("producto-activo").checked,
@@ -718,7 +1620,6 @@
             ? `${API_URL}/productos/${id}`
             : `${API_URL}/productos`;
           const method = id ? "PUT" : "POST";
-
           const res = await fetch(url, {
             method: method,
             headers: {
@@ -733,35 +1634,990 @@
             cerrarModalProducto();
             cargarProductos();
           } else {
-            const error = await res.json();
-            alert("❌ Error: " + (error.message || "No se pudo guardar"));
+            alert("❌ Error al guardar");
           }
         } catch (error) {
-          console.error("Error:", error);
           alert("❌ Error de conexión");
         }
       }
 
-      // Eliminar producto
       async function eliminarProducto(id) {
-        if (!confirm("¿Estás seguro de eliminar este producto?")) return;
-
+        if (!confirm("¿Eliminar este producto?")) return;
         try {
           const res = await fetch(`${API_URL}/productos/${id}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
           });
-
           if (res.ok) {
             alert("✅ Producto eliminado");
             cargarProductos();
+          }
+        } catch (error) {
+          alert("❌ Error");
+        }
+      }
+
+      // ========== RECARGAR SALDO (CORREGIDO) ==========
+      async function procesarRecarga(event) {
+        event.preventDefault();
+        const uid = document.getElementById("recarga-uid").value.trim();
+        const monto = parseFloat(
+          document.getElementById("recarga-monto").value,
+        );
+
+        if (!uid || monto <= 0) {
+          alert("⚠️ Completa todos los campos");
+          return;
+        }
+
+        try {
+          const res = await fetch(
+            `${API_URL}/tarjetas/recargar?uid=${encodeURIComponent(uid)}&monto=${monto}`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+            alert(
+              `✅ Recarga exitosa\n\nNuevo saldo: $${data.nuevoSaldo.toFixed(2)}`,
+            );
+            document.getElementById("info-recarga").style.display = "block";
+            document.getElementById("recarga-usuario").textContent =
+              data.usuario || "Usuario";
+            document.getElementById("recarga-saldo-actual").textContent =
+              "$" + (data.nuevoSaldo || 0).toFixed(2);
+            document.getElementById("form-recarga").reset();
+            cargarRecargasHoy();
           } else {
-            alert("❌ Error al eliminar");
+            const error = await res.json();
+            alert("❌ Error: " + (error.error || "No se pudo procesar"));
+          }
+        } catch (error) {
+          alert("❌ Error de conexión");
+        }
+      }
+
+      // ========== CARGAR RECARGAS DE HOY ) ==========
+      async function cargarRecargasHoy() {
+        try {
+          const res = await fetch(`${API_URL}/transacciones`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.ok) {
+            const transacciones = await res.json();
+
+            const hoy = new Date().toISOString().split("T")[0];
+            const recargasHoy = transacciones.filter((t) => {
+              const fechaTrans = new Date(t.fecha).toISOString().split("T")[0];
+              return fechaTrans === hoy && t.tipo === "RECARGA";
+            });
+
+            const tbody = document.getElementById("tabla-recargas-hoy");
+            if (recargasHoy.length === 0) {
+              tbody.innerHTML =
+                '<tr><td colspan="3" style="text-align:center; padding: 20px;">No hay recargas hoy</td></tr>';
+            } else {
+              tbody.innerHTML = recargasHoy
+                .map((t) => {
+                  return `
+            <tr>
+              <td>${new Date(t.fecha).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}</td>
+              <td>${t.usuario?.nombreCompleto || t.usuario?.email || "Usuario"}</td>
+              <!-- ❌ SIN COLUMNA UID -->
+              <td style="font-weight: bold; color: #27ae60">$${Math.abs(t.monto).toFixed(2)}</td>
+            </tr>
+          `;
+                })
+                .join("");
+            }
+          }
+        } catch (error) {
+          console.error("❌ Error cargando recargas:", error);
+        }
+      }
+
+      // ========== COBRAR CON RFID ==========
+      let carritoCompra = [];
+      let productosVenta = [];
+      let saldoActual = 0;
+
+      async function cargarProductosVenta() {
+        try {
+          const res = await fetch(`${API_URL}/productos`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (res.ok) {
+            productosVenta = await res.json();
+            mostrarProductosVenta(productosVenta);
           }
         } catch (error) {
           console.error("Error:", error);
+        }
+      }
+
+      function mostrarProductosVenta(productos) {
+        const grid = document.getElementById("grid-productos");
+        if (!productos || productos.length === 0) {
+          grid.innerHTML =
+            '<p style="text-align: center; color: #999; padding: 20px;">No hay productos</p>';
+          return;
+        }
+
+        grid.innerHTML = productos
+          .filter((p) => p.activo && p.stock > 0)
+          .map(
+            (p) => `
+      <div onclick="agregarProductoCarrito(${p.id})" style="background: white; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; border: 2px solid #e0e0e0; transition: all 0.3s;" 
+           onmouseover="this.style.borderColor='var(--primary)'; this.style.transform='translateY(-5px)'" 
+           onmouseout="this.style.borderColor='#e0e0e0'; this.style.transform='translateY(0)'">
+        <div style="width: 60px; height: 60px; background: var(--primary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-${obtenerIconoProducto(p.nombre)}" style="font-size: 24px; color: white;"></i>
+        </div>
+        <h4 style="font-size: 13px; margin: 10px 0 5px 0; font-weight: 600;">${p.nombre}</h4>
+        <p style="font-size: 14px; color: var(--primary); font-weight: bold; margin: 5px 0;">$ ${p.precio.toFixed(2)}</p>
+        <p style="font-size: 11px; color: #666; margin: 5px 0;">${p.descripcion || "Producto"}</p>
+        <p style="font-size: 11px; color: #27ae60; margin: 5px 0;">Stock: ${p.stock}</p>
+      </div>
+    `,
+          )
+          .join("");
+      }
+
+      function obtenerIconoProducto(nombre) {
+        const n = nombre.toLowerCase();
+        if (n.includes("café") || n.includes("cafe")) return "coffee";
+        if (n.includes("jugo") || n.includes("te") || n.includes("té"))
+          return "glass-whiskey";
+        if (
+          n.includes("hamburguesa") ||
+          n.includes("seco") ||
+          n.includes("chaulafán") ||
+          n.includes("cubano")
+        )
+          return "hamburger";
+        if (
+          n.includes("empanada") ||
+          n.includes("sandwich") ||
+          n.includes("sándwich")
+        )
+          return "bread-slice";
+        if (n.includes("galleta") || n.includes("pizza")) return "pizza-slice";
+        if (n.includes("cola") || n.includes("refresco")) return "wine-bottle";
+        return "utensils";
+      }
+
+      function filtrarProductosVenta() {
+        const busqueda = document
+          .getElementById("buscar-producto-venta")
+          .value.toLowerCase();
+        let filtrados = productosVenta.filter((p) => p.activo && p.stock > 0);
+
+        if (busqueda) {
+          filtrados = filtrados.filter((p) =>
+            p.nombre.toLowerCase().includes(busqueda),
+          );
+        }
+
+        mostrarProductosVenta(filtrados);
+      }
+
+      async function verificarTarjetaCobro() {
+        const uid = document.getElementById("cobro-uid").value.trim();
+        if (uid.length < 5) {
+          document.getElementById("info-cobro").style.display = "none";
+          return;
+        }
+
+        document.getElementById("info-cobro").style.display = "block";
+        document.getElementById("cobro-usuario").textContent = "Verificando...";
+        document.getElementById("cobro-saldo").textContent = "$--";
+
+        try {
+          // ✅ PETICIÓN AL BACKEND PARA OBTENER SALDO REAL
+          const res = await fetch(
+            `${API_URL}/tarjetas/verificar?uid=${encodeURIComponent(uid)}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            },
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+
+            // ✅ USAR SALDO REAL DEL BACKEND
+            saldoActual = data.saldo || 0;
+
+            document.getElementById("cobro-usuario").textContent =
+              data.nombreCompleto || data.usuario || "Estudiante Verificado";
+
+            document.getElementById("cobro-saldo").textContent =
+              "$" + saldoActual.toFixed(2);
+
+            actualizarResumen();
+          } else {
+            const error = await res.json();
+            document.getElementById("info-cobro").style.display = "none";
+            alert("❌ " + (error.error || "Tarjeta no válida"));
+          }
+        } catch (error) {
+          console.error("❌ Error:", error);
+          document.getElementById("info-cobro").style.display = "none";
+          alert("❌ Error al verificar la tarjeta");
+        }
+      }
+
+      function agregarProductoCarrito(idProducto) {
+        const producto = productosVenta.find((p) => p.id === idProducto);
+        if (!producto) return;
+
+        const yaExiste = carritoCompra.find((item) => item.id === idProducto);
+        if (yaExiste) {
+          yaExiste.cantidad++;
+        } else {
+          carritoCompra.push({
+            id: producto.id,
+            nombre: producto.nombre,
+            precio: producto.precio,
+            cantidad: 1,
+          });
+        }
+
+        actualizarCarrito();
+        actualizarResumen();
+      }
+
+      function actualizarCarrito() {
+        const contenedor = document.getElementById("carrito-productos");
+
+        if (carritoCompra.length === 0) {
+          contenedor.innerHTML = "";
+          return;
+        }
+
+        contenedor.innerHTML = carritoCompra
+          .map((item, index) => {
+            const subtotal = item.precio * item.cantidad;
+            return `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 8px; margin-bottom: 8px;">
+          <div style="flex: 1;">
+            <strong>${item.nombre}</strong><br>
+            <small style="color: #666;">$${item.precio.toFixed(2)} x ${item.cantidad}</small>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-weight: bold; color: var(--primary); margin-right: 10px;">$${subtotal.toFixed(2)}</span>
+            <button onclick="eliminarDelCarrito(${index})" style="background: #e74c3c; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 12px;">
+              ×
+            </button>
+          </div>
+        </div>
+      `;
+          })
+          .join("");
+      }
+
+      function eliminarDelCarrito(index) {
+        carritoCompra.splice(index, 1);
+        actualizarCarrito();
+        actualizarResumen();
+      }
+
+      function actualizarResumen() {
+        let total = carritoCompra.reduce(
+          (sum, item) => sum + item.precio * item.cantidad,
+          0,
+        );
+        document.getElementById("precio-total").textContent =
+          "$ " + total.toFixed(2);
+        document.getElementById("saldo-despues").textContent =
+          "$ " + (saldoActual - total).toFixed(2);
+      }
+
+      async function procesarCobro() {
+        const uid = document.getElementById("cobro-uid").value.trim();
+
+        if (!uid) {
+          alert("⚠️ Escanea una tarjeta RFID");
+          return;
+        }
+
+        if (carritoCompra.length === 0) {
+          alert("⚠️ El carrito está vacío");
+          return;
+        }
+
+        const productosIds = carritoCompra.flatMap((item) =>
+          Array(item.cantidad).fill(item.id),
+        );
+
+        try {
+          const res = await fetch(`${API_URL}/tarjetas/compra`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tarjetaUid: uid,
+              productosIds: productosIds,
+            }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            alert(
+              `✅ Cobro exitoso\n\nTotal: $${data.totalCobrado.toFixed(2)}\nNuevo saldo: $${data.nuevoSaldo.toFixed(2)}`,
+            );
+
+            carritoCompra = [];
+            actualizarCarrito();
+            actualizarResumen();
+            document.getElementById("cobro-uid").value = "";
+            document.getElementById("info-cobro").style.display = "none";
+
+            cargarVentasHoy();
+          } else {
+            const error = await res.json();
+            alert("❌ Error: " + (error.error || "No se pudo procesar"));
+          }
+        } catch (error) {
           alert("❌ Error de conexión");
         }
+      }
+
+      async function cargarVentasHoy() {
+        try {
+          const res = await fetch(`${API_URL}/transacciones`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.ok) {
+            const transacciones = await res.json();
+            const hoy = new Date().toISOString().split("T")[0];
+            const ventasHoy = transacciones.filter((t) => {
+              const fechaTrans = new Date(t.fecha).toISOString().split("T")[0];
+              return (
+                fechaTrans === hoy &&
+                (t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA")
+              );
+            });
+
+            const tbody = document.getElementById("tabla-ventas-hoy");
+            if (ventasHoy.length === 0) {
+              tbody.innerHTML =
+                '<tr><td colspan="4" style="text-align:center; padding: 20px;">No hay ventas hoy</td></tr>';
+            } else {
+              tbody.innerHTML = ventasHoy
+                .map(
+                  (t) => `
+            <tr>
+              <td>${new Date(t.fecha).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}</td>
+              <td>${t.usuario?.nombreCompleto || t.usuario?.email || "Usuario"}</td>
+              <td style="font-size: 12px;">${t.detalle || "--"}</td>
+              <td style="font-weight: bold; color: var(--primary)">$${Math.abs(t.monto).toFixed(2)}</td>
+            </tr>
+          `,
+                )
+                .join("");
+            }
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
+      // ========== GESTIÓN DE TRANSACCIONES ==========
+      let todasLasTransacciones = [];
+      let transaccionesFiltradas = [];
+      let paginaActual = 1;
+      const transaccionesPorPagina = 15;
+
+      async function cargarTransacciones() {
+        try {
+          const res = await fetch(`${API_URL}/transacciones`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.ok) {
+            todasLasTransacciones = await res.json();
+            console.log(
+              "📋 Transacciones cargadas:",
+              todasLasTransacciones.length,
+            );
+
+            // Ordenar por fecha descendente (más recientes primero)
+            todasLasTransacciones.sort(
+              (a, b) => new Date(b.fecha) - new Date(a.fecha),
+            );
+
+            transaccionesFiltradas = [...todasLasTransacciones];
+            paginaActual = 1;
+
+            calcularEstadisticas();
+            mostrarTransacciones();
+          } else {
+            console.error("Error al cargar transacciones");
+            mostrarTransaccionesDemo();
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          mostrarTransaccionesDemo();
+        }
+      }
+
+      function calcularEstadisticas() {
+        const total = transaccionesFiltradas.length;
+
+        const recargas = transaccionesFiltradas
+          .filter((t) => t.tipo === "RECARGA")
+          .reduce((sum, t) => sum + Math.abs(t.monto || 0), 0);
+
+        const compras = transaccionesFiltradas
+          .filter((t) => t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA")
+          .reduce((sum, t) => sum + Math.abs(t.monto || 0), 0);
+
+        const balance = recargas - compras;
+
+        document.getElementById("stat-total-transacciones").textContent = total;
+        document.getElementById("stat-recargas").textContent =
+          "$" + recargas.toFixed(2);
+        document.getElementById("stat-compras").textContent =
+          "$" + compras.toFixed(2);
+        document.getElementById("stat-balance").textContent =
+          "$" + balance.toFixed(2);
+      }
+
+      function mostrarTransacciones() {
+        const tbody = document.getElementById("tabla-transacciones");
+
+        if (transaccionesFiltradas.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center; padding: 30px; color: #999;">No se encontraron transacciones</td></tr>';
+          actualizarPaginacion();
+          return;
+        }
+
+        // Calcular rango de transacciones para la página actual
+        const inicio = (paginaActual - 1) * transaccionesPorPagina;
+        const fin = inicio + transaccionesPorPagina;
+        const transaccionesPagina = transaccionesFiltradas.slice(inicio, fin);
+
+        tbody.innerHTML = transaccionesPagina
+          .map((t) => {
+            const fecha = new Date(t.fecha).toLocaleString("es-EC", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            const tipo = t.tipo || "COMPRA_BAR";
+            let badgeColor = "bg-success";
+            if (tipo === "RECARGA") badgeColor = "bg-warning";
+
+            const usuario =
+              t.usuario?.nombreCompleto || t.usuario?.email || "Usuario";
+            const monto = Math.abs(t.monto || 0).toFixed(2);
+            const montoColor = tipo === "RECARGA" ? "#27ae60" : "#e74c3c";
+            const signo = tipo === "RECARGA" ? "+" : "-";
+
+            return `
+      <tr style="transition: background 0.2s;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+        <td style="font-weight: 600; color: #666;">#${t.id}</td>
+        <td style="font-size: 13px;">${fecha}</td>
+        <td style="font-weight: 500;">${usuario}</td>
+        <td><span class="badge ${badgeColor}">${tipo}</span></td>
+        <td style="font-size: 13px; color: #666; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${t.detalle || "--"}</td>
+        <td style="font-weight: bold; font-size: 15px; color: ${montoColor};">${signo}$${monto}</td>
+      </tr>
+    `;
+          })
+          .join("");
+
+        actualizarPaginacion();
+      }
+
+      function filtrarTransacciones() {
+        const busqueda = document
+          .getElementById("buscar-transaccion")
+          .value.toLowerCase();
+        const tipoFiltro = document.getElementById("filtro-tipo").value;
+        const fechaFiltro = document.getElementById("filtro-fecha").value;
+
+        transaccionesFiltradas = todasLasTransacciones.filter((t) => {
+          // Filtro de búsqueda
+          const usuario = (
+            t.usuario?.nombreCompleto ||
+            t.usuario?.email ||
+            ""
+          ).toLowerCase();
+          const tipo = (t.tipo || "").toLowerCase();
+          const monto = (t.monto || 0).toString();
+          const detalle = (t.detalle || "").toLowerCase();
+
+          const coincideBusqueda =
+            !busqueda ||
+            usuario.includes(busqueda) ||
+            tipo.includes(busqueda) ||
+            monto.includes(busqueda) ||
+            detalle.includes(busqueda);
+
+          // Filtro de tipo
+          const coincideTipo = !tipoFiltro || t.tipo === tipoFiltro;
+
+          // Filtro de fecha
+          let coincideFecha = true;
+          if (fechaFiltro !== "todas") {
+            const fechaTransaccion = new Date(t.fecha);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            if (fechaFiltro === "hoy") {
+              const fechaTrans = new Date(fechaTransaccion);
+              fechaTrans.setHours(0, 0, 0, 0);
+              coincideFecha = fechaTrans.getTime() === hoy.getTime();
+            } else if (fechaFiltro === "semana") {
+              const semanaAtras = new Date(hoy);
+              semanaAtras.setDate(semanaAtras.getDate() - 7);
+              coincideFecha = fechaTransaccion >= semanaAtras;
+            } else if (fechaFiltro === "mes") {
+              const mesAtras = new Date(hoy);
+              mesAtras.setMonth(mesAtras.getMonth() - 1);
+              coincideFecha = fechaTransaccion >= mesAtras;
+            }
+          }
+
+          return coincideBusqueda && coincideTipo && coincideFecha;
+        });
+
+        paginaActual = 1;
+        calcularEstadisticas();
+        mostrarTransacciones();
+      }
+
+      function actualizarPaginacion() {
+        const totalPaginas = Math.ceil(
+          transaccionesFiltradas.length / transaccionesPorPagina,
+        );
+        const inicio = (paginaActual - 1) * transaccionesPorPagina + 1;
+        const fin = Math.min(
+          inicio + transaccionesPorPagina - 1,
+          transaccionesFiltradas.length,
+        );
+
+        document.getElementById("info-paginacion").textContent =
+          `Mostrando ${inicio} - ${fin} de ${transaccionesFiltradas.length} transacciones`;
+
+        document.getElementById("numero-pagina").textContent =
+          `${paginaActual} / ${totalPaginas || 1}`;
+
+        document.getElementById("btn-anterior").disabled = paginaActual === 1;
+        document.getElementById("btn-siguiente").disabled =
+          paginaActual >= totalPaginas || totalPaginas === 0;
+      }
+
+      function cambiarPagina(direccion) {
+        const totalPaginas = Math.ceil(
+          transaccionesFiltradas.length / transaccionesPorPagina,
+        );
+
+        paginaActual += direccion;
+
+        if (paginaActual < 1) paginaActual = 1;
+        if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+
+        mostrarTransacciones();
+
+        // Scroll suave al inicio de la tabla
+        document
+          .getElementById("tabla-transacciones")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function mostrarTransaccionesDemo() {
+        todasLasTransacciones = [
+          {
+            id: 1,
+            fecha: new Date().toISOString(),
+            usuario: { email: "demo@ude.edu.ec" },
+            tipo: "RECARGA",
+            monto: 20,
+            detalle: "Recarga demo",
+          },
+          {
+            id: 2,
+            fecha: new Date().toISOString(),
+            usuario: { email: "demo@ude.edu.ec" },
+            tipo: "COMPRA_BAR",
+            monto: -5.5,
+            detalle: "Compra demo",
+          },
+        ];
+        transaccionesFiltradas = [...todasLasTransacciones];
+        calcularEstadisticas();
+        mostrarTransacciones();
+      }
+      // ========== REPORTES MENSUALES ==========
+      let chartVentasDiarias = null;
+      let chartTipos = null;
+
+      async function cargarReportes() {
+        const mes = parseInt(
+          document.getElementById("selector-mes-reporte").value,
+        );
+        const anio = parseInt(
+          document.getElementById("selector-anio-reporte").value,
+        );
+
+        console.log(`📊 Cargando reportes para ${mes + 1}/${anio}`);
+
+        try {
+          const res = await fetch(`${API_URL}/transacciones`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.ok) {
+            const todasTransacciones = await res.json();
+
+            // Filtrar transacciones del mes seleccionado
+            const transaccionesMes = todasTransacciones.filter((t) => {
+              const fecha = new Date(t.fecha);
+              return fecha.getMonth() === mes && fecha.getFullYear() === anio;
+            });
+
+            console.log(
+              `✅ ${transaccionesMes.length} transacciones encontradas`,
+            );
+
+            procesarReportes(transaccionesMes, mes, anio);
+          } else {
+            console.error("Error al cargar transacciones");
+            mostrarReportesDemo();
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          mostrarReportesDemo();
+        }
+      }
+
+      function procesarReportes(transacciones, mes, anio) {
+        // 1. Calcular totales
+        const ingresos = transacciones
+          .filter((t) => t.tipo === "RECARGA")
+          .reduce((sum, t) => sum + Math.abs(t.monto || 0), 0);
+
+        const ventas = transacciones
+          .filter((t) => t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA")
+          .reduce((sum, t) => sum + Math.abs(t.monto || 0), 0);
+
+        const diasEnMes = new Date(anio, mes + 1, 0).getDate();
+        const promedioDiario = ventas / diasEnMes;
+
+        document.getElementById("reporte-ingresos").textContent =
+          "$" + ingresos.toFixed(2);
+        document.getElementById("reporte-ventas").textContent =
+          "$" + ventas.toFixed(2);
+        document.getElementById("reporte-transacciones").textContent =
+          transacciones.length;
+        document.getElementById("reporte-promedio").textContent =
+          "$" + promedioDiario.toFixed(2);
+
+        // 2. Gráfico de ventas diarias
+        generarGraficoVentasDiarias(transacciones, mes, anio);
+
+        // 3. Gráfico de tipos de transacción
+        generarGraficoTipos(transacciones);
+
+        // 4. Top productos
+        generarTopProductos(transacciones);
+
+        // 5. Top usuarios
+        generarTopUsuarios(transacciones);
+      }
+
+      function generarGraficoVentasDiarias(transacciones, mes, anio) {
+        const diasEnMes = new Date(anio, mes + 1, 0).getDate();
+        const ventasPorDia = Array(diasEnMes).fill(0);
+
+        // Agrupar ventas por día
+        transacciones
+          .filter((t) => t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA")
+          .forEach((t) => {
+            const dia = new Date(t.fecha).getDate();
+            ventasPorDia[dia - 1] += Math.abs(t.monto || 0);
+          });
+
+        const labels = Array.from(
+          { length: diasEnMes },
+          (_, i) => `Día ${i + 1}`,
+        );
+
+        // Destruir gráfico anterior si existe
+        if (chartVentasDiarias) {
+          chartVentasDiarias.destroy();
+        }
+
+        const ctx = document
+          .getElementById("grafico-ventas-diarias")
+          .getContext("2d");
+        chartVentasDiarias = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Ventas ($)",
+                data: ventasPorDia,
+                borderColor: "#796696",
+                backgroundColor: "rgba(121, 102, 150, 0.1)",
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: "#796696",
+                pointBorderColor: "#fff",
+                pointBorderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                padding: 12,
+                titleFont: { size: 14, weight: "bold" },
+                bodyFont: { size: 13 },
+                callbacks: {
+                  label: function (context) {
+                    return "Ventas: $" + context.parsed.y.toFixed(2);
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function (value) {
+                    return "$" + value.toFixed(0);
+                  },
+                },
+                grid: {
+                  color: "rgba(0, 0, 0, 0.05)",
+                },
+              },
+              x: {
+                grid: {
+                  display: false,
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function generarGraficoTipos(transacciones) {
+        const recargas = transacciones.filter(
+          (t) => t.tipo === "RECARGA",
+        ).length;
+        const compras = transacciones.filter(
+          (t) => t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA",
+        ).length;
+
+        // Destruir gráfico anterior si existe
+        if (chartTipos) {
+          chartTipos.destroy();
+        }
+
+        const ctx = document.getElementById("grafico-tipos").getContext("2d");
+        chartTipos = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: ["Recargas", "Compras"],
+            datasets: [
+              {
+                data: [recargas, compras],
+                backgroundColor: ["#f39c12", "#796696"],
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  padding: 15,
+                  font: { size: 13 },
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                padding: 12,
+                callbacks: {
+                  label: function (context) {
+                    const total = context.dataset.data.reduce(
+                      (a, b) => a + b,
+                      0,
+                    );
+                    const porcentaje = ((context.parsed / total) * 100).toFixed(
+                      1,
+                    );
+                    return (
+                      context.label +
+                      ": " +
+                      context.parsed +
+                      " (" +
+                      porcentaje +
+                      "%)"
+                    );
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function generarTopProductos(transacciones) {
+        const productosVendidos = {};
+
+        transacciones
+          .filter((t) => t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA")
+          .forEach((t) => {
+            if (t.detalle) {
+              // Intentar extraer productos del detalle
+              const productos = t.detalle.split(",").map((p) => p.trim());
+              productos.forEach((prod) => {
+                if (prod && prod.length > 0) {
+                  productosVendidos[prod] = (productosVendidos[prod] || 0) + 1;
+                }
+              });
+            }
+          });
+
+        // Ordenar por cantidad vendida
+        const topProductos = Object.entries(productosVendidos)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10);
+
+        const contenedor = document.getElementById("top-productos");
+
+        if (topProductos.length === 0) {
+          contenedor.innerHTML =
+            '<p style="text-align: center; color: #999; padding: 30px;">No hay datos disponibles</p>';
+          return;
+        }
+
+        const maxVentas = topProductos[0][1];
+
+        contenedor.innerHTML = topProductos
+          .map((item, index) => {
+            const [nombre, cantidad] = item;
+            const porcentaje = (cantidad / maxVentas) * 100;
+
+            return `
+      <div style="margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <span style="font-weight: 600; color: #333;">
+            <span style="display: inline-block; width: 25px; height: 25px; background: ${index < 3 ? "#796696" : "#e0e0e0"}; 
+                         color: white; border-radius: 50%; text-align: center; line-height: 25px; font-size: 12px; margin-right: 8px;">
+              ${index + 1}
+            </span>
+            ${nombre}
+          </span>
+          <span style="font-weight: bold; color: var(--primary);">${cantidad} ventas</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden;">
+          <div style="width: ${porcentaje}%; height: 100%; background: linear-gradient(90deg, #796696, #9b7ec4); transition: width 0.5s;"></div>
+        </div>
+      </div>
+    `;
+          })
+          .join("");
+      }
+
+      function generarTopUsuarios(transacciones) {
+        const usuariosActividad = {};
+
+        transacciones.forEach((t) => {
+          const usuario =
+            t.usuario?.nombreCompleto || t.usuario?.email || "Desconocido";
+          if (!usuariosActividad[usuario]) {
+            usuariosActividad[usuario] = { transacciones: 0, total: 0 };
+          }
+          usuariosActividad[usuario].transacciones++;
+          usuariosActividad[usuario].total += Math.abs(t.monto || 0);
+        });
+
+        const topUsuarios = Object.entries(usuariosActividad)
+          .sort((a, b) => b[1].transacciones - a[1].transacciones)
+          .slice(0, 10);
+
+        const contenedor = document.getElementById("top-usuarios");
+
+        if (topUsuarios.length === 0) {
+          contenedor.innerHTML =
+            '<p style="text-align: center; color: #999; padding: 30px;">No hay datos disponibles</p>';
+          return;
+        }
+
+        contenedor.innerHTML = topUsuarios
+          .map((item, index) => {
+            const [nombre, datos] = item;
+
+            return `
+      <div style="padding: 15px; background: ${index % 2 === 0 ? "#f8f9fa" : "white"}; border-radius: 8px; margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #796696, #9b7ec4); 
+                        border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                        color: white; font-weight: bold; font-size: 16px;">
+              ${index + 1}
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #333; margin-bottom: 3px;">${nombre}</div>
+              <div style="font-size: 12px; color: #666;">${datos.transacciones} transacciones</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: bold; color: var(--primary); font-size: 16px;">$${datos.total.toFixed(2)}</div>
+            <div style="font-size: 11px; color: #999;">Total gastado</div>
+          </div>
+        </div>
+      </div>
+    `;
+          })
+          .join("");
+      }
+
+      function mostrarReportesDemo() {
+        document.getElementById("reporte-ingresos").textContent = "$150.00";
+        document.getElementById("reporte-ventas").textContent = "$85.50";
+        document.getElementById("reporte-transacciones").textContent = "15";
+        document.getElementById("reporte-promedio").textContent = "$2.85";
+
+        document.getElementById("top-productos").innerHTML =
+          '<p style="text-align: center; color: #999; padding: 30px;">Datos de demostración</p>';
+        document.getElementById("top-usuarios").innerHTML =
+          '<p style="text-align: center; color: #999; padding: 30px;">Datos de demostración</p>';
       }
     </script>
   </body>

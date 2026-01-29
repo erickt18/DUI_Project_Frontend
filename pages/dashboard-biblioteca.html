@@ -1,0 +1,1830 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Biblioteca - RFID Campus</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/biblioteca.css" />
+    <style>
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        animation: fadeIn 0.3s ease;
+      }
+      .modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 35px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--primary);
+      }
+      .modal-header h2 {
+        color: var(--bg-dark);
+        font-size: 24px;
+        margin: 0;
+      }
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 32px;
+        cursor: pointer;
+        color: #999;
+        transition: color 0.3s;
+        line-height: 1;
+      }
+      .close-modal:hover {
+        color: var(--danger);
+      }
+      .modal-body {
+        margin-bottom: 20px;
+      }
+      .user-info-card {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 25px;
+        border-left: 5px solid var(--success);
+      }
+      .user-info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 15px;
+      }
+      .user-info-row strong {
+        color: var(--bg-dark);
+      }
+      .user-info-row span {
+        color: #333;
+        font-weight: 500;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .rfid-input-container {
+        position: relative;
+        margin-bottom: 20px;
+      }
+      .rfid-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary);
+        font-size: 20px;
+      }
+      .rfid-input {
+        width: 100%;
+        padding: 15px 15px 15px 50px;
+        border: 3px solid var(--primary);
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+      .rfid-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(44, 95, 45, 0.2);
+        border-color: var(--primary-light);
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(44, 95, 45, 0.1);
+      }
+      .categoria-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+      }
+      .tab-button {
+        padding: 10px 20px;
+        border: none;
+        background: transparent;
+        color: #666;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        border-radius: 8px 8px 0 0;
+      }
+      .tab-button.active {
+        background: var(--primary);
+        color: white;
+      }
+      .tab-button:hover:not(.active) {
+        background: #f0f0f0;
+      }
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+      .btn-edit,
+      .btn-delete {
+        flex: 1;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 14px;
+      }
+      .btn-edit {
+        background: #3498db;
+        color: white;
+      }
+      .btn-edit:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+      }
+      .btn-delete {
+        background: #e74c3c;
+        color: white;
+      }
+      .btn-delete:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <div class="sidebar">
+        <h3><i class="fas fa-book"></i> ADMIN BIBLIOTECA</h3>
+        <div class="menu-item active" onclick="cambiarVista('dashboard', this)">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </div>
+        <div
+          class="menu-item"
+          onclick="toggleSubmenu('catalogo-submenu', this)"
+        >
+          <i class="fas fa-book-open"></i> Catálogo<i
+            class="fas fa-chevron-down"
+            style="margin-left: auto; font-size: 12px"
+          ></i>
+        </div>
+        <div id="catalogo-submenu" class="submenu">
+          <div class="submenu-item" onclick="cambiarVista('libros', this)">
+            <i class="fas fa-book"></i> Libros
+          </div>
+          <div class="submenu-item" onclick="cambiarVista('tesis', this)">
+            <i class="fas fa-graduation-cap"></i> Tesis
+          </div>
+          <div class="submenu-item" onclick="cambiarVista('articulos', this)">
+            <i class="fas fa-newspaper"></i> Artículos
+          </div>
+        </div>
+        <div
+          class="menu-item"
+          onclick="toggleSubmenu('servicios-submenu', this)"
+        >
+          <i class="fas fa-hands-helping"></i> Servicios<i
+            class="fas fa-chevron-down"
+            style="margin-left: auto; font-size: 12px"
+          ></i>
+        </div>
+        <div id="servicios-submenu" class="submenu">
+          <div class="submenu-item" onclick="cambiarVista('prestamos', this)">
+            <i class="fas fa-hand-holding"></i> Préstamos
+          </div>
+          <div
+            class="submenu-item"
+            onclick="cambiarVista('devoluciones', this)"
+          >
+            <i class="fas fa-undo"></i> Devoluciones
+          </div>
+        </div>
+        <div class="menu-item" onclick="toggleSubmenu('gestion-submenu', this)">
+          <i class="fas fa-cog"></i> Gestión<i
+            class="fas fa-chevron-down"
+            style="margin-left: auto; font-size: 12px"
+          ></i>
+        </div>
+        <div id="gestion-submenu" class="submenu">
+          <div
+            class="submenu-item"
+            onclick="cambiarVista('registrar-material', this)"
+          >
+            <i class="fas fa-plus-circle"></i> Añadir Material
+          </div>
+        </div>
+        <div
+          class="menu-item"
+          style="margin-top: auto; color: #ff6b6b"
+          onclick="logout()"
+        >
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div id="view-dashboard" class="view-section active">
+          <div class="header-dash">
+            <div>
+              <h1><i class="fas fa-home"></i> Dashboard Principal</h1>
+              <p>Vista general del sistema bibliotecario</p>
+            </div>
+            <button class="btn-primary" onclick="cargarDashboard()">
+              <i class="fas fa-sync-alt"></i> Refrescar
+            </button>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="icon"><i class="fas fa-book"></i></div>
+              <h4>Total Libros</h4>
+              <div class="number" id="stat-libros">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="icon"><i class="fas fa-hand-holding"></i></div>
+              <h4>Préstamos Activos</h4>
+              <div class="number" id="stat-prestamos">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="icon"><i class="fas fa-users"></i></div>
+              <h4>Usuarios Activos</h4>
+              <div class="number" id="stat-usuarios">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="icon">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <h4>Préstamos Vencidos</h4>
+              <div class="number" id="stat-vencidos">0</div>
+            </div>
+          </div>
+          <div class="glass-table-container">
+            <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Usuario</th>
+                  <th>Material</th>
+                  <th>Tipo</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-actividad">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 20px">
+                    No hay actividad reciente
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="view-libros" class="view-section">
+          <div class="header-dash">
+            <div>
+              <h1><i class="fas fa-book"></i> Catálogo de Libros</h1>
+              <p>Busca en la colección de libros disponibles</p>
+            </div>
+          </div>
+          <div
+            class="glass-table-container"
+            style="margin-bottom: 20px; padding: 15px"
+          >
+            <div style="position: relative">
+              <i
+                class="fas fa-search"
+                style="
+                  position: absolute;
+                  left: 15px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  color: #999;
+                "
+              ></i>
+              <input
+                type="text"
+                id="buscar-libro"
+                placeholder="Buscar por título, autor, ISBN..."
+                style="
+                  width: 100%;
+                  padding: 12px 12px 12px 45px;
+                  border: 1px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                "
+                oninput="buscarMaterial('LIBRO')"
+              />
+            </div>
+          </div>
+          <div id="resultados-libros" class="glass-table-container">
+            <p style="text-align: center; padding: 30px; color: #999">
+              Escribe para buscar libros...
+            </p>
+          </div>
+        </div>
+
+        <div id="view-tesis" class="view-section">
+          <div class="header-dash">
+            <div>
+              <h1><i class="fas fa-graduation-cap"></i> Catálogo de Tesis</h1>
+              <p>Explora las tesis universitarias disponibles</p>
+            </div>
+          </div>
+          <div
+            class="glass-table-container"
+            style="margin-bottom: 20px; padding: 15px"
+          >
+            <div style="position: relative">
+              <i
+                class="fas fa-search"
+                style="
+                  position: absolute;
+                  left: 15px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  color: #999;
+                "
+              ></i>
+              <input
+                type="text"
+                id="buscar-tesis"
+                placeholder="Buscar tesis por título, autor..."
+                style="
+                  width: 100%;
+                  padding: 12px 12px 12px 45px;
+                  border: 1px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                "
+                oninput="buscarMaterial('TESIS')"
+              />
+            </div>
+          </div>
+          <div id="resultados-tesis" class="glass-table-container">
+            <p style="text-align: center; padding: 30px; color: #999">
+              Escribe para buscar tesis...
+            </p>
+          </div>
+        </div>
+
+        <div id="view-articulos" class="view-section">
+          <div class="header-dash">
+            <div>
+              <h1><i class="fas fa-newspaper"></i> Catálogo de Artículos</h1>
+              <p>Consulta artículos académicos y científicos</p>
+            </div>
+          </div>
+          <div
+            class="glass-table-container"
+            style="margin-bottom: 20px; padding: 15px"
+          >
+            <div style="position: relative">
+              <i
+                class="fas fa-search"
+                style="
+                  position: absolute;
+                  left: 15px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  color: #999;
+                "
+              ></i>
+              <input
+                type="text"
+                id="buscar-articulo"
+                placeholder="Buscar artículos por título, autor..."
+                style="
+                  width: 100%;
+                  padding: 12px 12px 12px 45px;
+                  border: 1px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                "
+                oninput="buscarMaterial('ARTICULO')"
+              />
+            </div>
+          </div>
+          <div id="resultados-articulos" class="glass-table-container">
+            <p style="text-align: center; padding: 30px; color: #999">
+              Escribe para buscar artículos...
+            </p>
+          </div>
+        </div>
+
+        <div id="view-prestamos" class="view-section">
+          <div class="header-dash">
+            <div>
+              <h1><i class="fas fa-hand-holding"></i> Gestión de Préstamos</h1>
+              <p>Registra préstamos escaneando la tarjeta RFID</p>
+            </div>
+          </div>
+          <div
+            class="glass-table-container"
+            style="max-width: 800px; margin: 0 auto 30px"
+          >
+            <h3 style="margin-bottom: 20px">
+              <i class="fas fa-id-card"></i> Escanear Tarjeta RFID
+            </h3>
+            <div class="rfid-input-container">
+              <i class="fas fa-wifi rfid-icon"></i
+              ><input
+                type="text"
+                id="rfid-prestamo"
+                class="rfid-input"
+                placeholder="Acerca la tarjeta al lector..."
+                onkeypress="if (event.key === 'Enter') abrirModalPrestamo();"
+              />
+            </div>
+            <p style="text-align: center; color: #666; font-size: 14px">
+              <i class="fas fa-info-circle"></i> Acerca la tarjeta RFID al
+              lector y presiona Enter
+            </p>
+          </div>
+          <div
+            class="glass-table-container"
+            style="margin-bottom: 20px; padding: 15px"
+          >
+            <div style="position: relative">
+              <i
+                class="fas fa-search"
+                style="
+                  position: absolute;
+                  left: 15px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  color: #999;
+                "
+              ></i>
+              <input
+                type="text"
+                id="buscar-prestamo"
+                placeholder="Buscar préstamos por usuario, libro o ID..."
+                style="
+                  width: 100%;
+                  padding: 12px 12px 12px 45px;
+                  border: 1px solid #ddd;
+                  border-radius: 8px;
+                  font-size: 14px;
+                "
+                oninput="filtrarPrestamos()"
+              />
+            </div>
+          </div>
+          <div class="glass-table-container">
+            <h3>
+              <i class="fas fa-list"></i> Préstamos Activos (<span
+                id="contador-prestamos"
+                >0</span
+              >)
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>#ID</th>
+                  <th>Usuario</th>
+                  <th>Material</th>
+                  <th>Fecha Préstamo</th>
+                  <th>Devolución Estimada</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-prestamos">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 20px">
+                    No hay préstamos activos
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="view-devoluciones" class="view-section">
+          <div class="header-dash">
+            <div>
+              <h1><i class="fas fa-undo"></i> Gestión de Devoluciones</h1>
+              <p>Registra devoluciones escaneando la tarjeta RFID</p>
+            </div>
+          </div>
+          <div
+            class="glass-table-container"
+            style="max-width: 800px; margin: 0 auto 30px"
+          >
+            <h3 style="margin-bottom: 20px">
+              <i class="fas fa-id-card"></i> Escanear Tarjeta RFID
+            </h3>
+            <div class="rfid-input-container">
+              <i class="fas fa-wifi rfid-icon"></i
+              ><input
+                type="text"
+                id="rfid-devolucion"
+                class="rfid-input"
+                placeholder="Acerca la tarjeta al lector..."
+                onkeypress="if (event.key === 'Enter') abrirModalDevolucion();"
+              />
+            </div>
+            <p style="text-align: center; color: #666; font-size: 14px">
+              <i class="fas fa-info-circle"></i> Acerca la tarjeta RFID del
+              estudiante para ver sus préstamos activos
+            </p>
+          </div>
+          <div class="glass-table-container">
+            <h3><i class="fas fa-history"></i> Historial de Devoluciones</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>#ID</th>
+                  <th>Usuario</th>
+                  <th>Material</th>
+                  <th>Fecha Préstamo</th>
+                  <th>Fecha Devolución</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-devoluciones">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 20px">
+                    No hay devoluciones registradas
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="view-registrar-material" class="view-section">
+          <div class="header-dash">
+            <div>
+              <h1>
+                <i class="fas fa-plus-circle"></i> Añadir Material Bibliográfico
+              </h1>
+              <p>Registra libros, tesis y artículos en el catálogo</p>
+            </div>
+          </div>
+          <div
+            class="glass-table-container"
+            style="max-width: 900px; margin: 0 auto"
+          >
+            <div class="categoria-tabs">
+              <button
+                class="tab-button active"
+                onclick="cambiarTab('LIBRO', event)"
+              >
+                <i class="fas fa-book"></i> Libro
+              </button>
+              <button class="tab-button" onclick="cambiarTab('TESIS', event)">
+                <i class="fas fa-graduation-cap"></i> Tesis
+              </button>
+              <button
+                class="tab-button"
+                onclick="cambiarTab('ARTICULO', event)"
+              >
+                <i class="fas fa-newspaper"></i> Artículo
+              </button>
+            </div>
+            <form id="form-material" onsubmit="guardarMaterial(event)">
+              <input type="hidden" id="material-categoria" value="LIBRO" />
+
+              <!-- FORMULARIO LIBRO -->
+              <div id="form-libro" class="form-content">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Título *</label
+                    ><input
+                      type="text"
+                      id="libro-titulo"
+                      placeholder="Título del libro"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Autor *</label
+                    ><input
+                      type="text"
+                      id="libro-autor"
+                      placeholder="Nombre del autor"
+                    />
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>ISBN</label
+                    ><input
+                      type="text"
+                      id="libro-isbn"
+                      placeholder="978-1234567890"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Editorial</label
+                    ><input
+                      type="text"
+                      id="libro-editorial"
+                      placeholder="Editorial"
+                    />
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Año de Publicación</label
+                    ><input
+                      type="number"
+                      id="libro-anio"
+                      min="1900"
+                      max="2099"
+                      placeholder="2024"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Categoría</label
+                    ><input
+                      type="text"
+                      id="libro-categoria"
+                      placeholder="Ficción, Técnico, etc."
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Cantidad Disponible *</label
+                  ><input
+                    type="number"
+                    id="libro-stock"
+                    min="1"
+                    placeholder="5"
+                  />
+                </div>
+              </div>
+
+              <!-- FORMULARIO TESIS -->
+              <div id="form-tesis" class="form-content" style="display: none">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Título *</label
+                    ><input
+                      type="text"
+                      id="tesis-titulo"
+                      placeholder="Título de la tesis"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Autor *</label
+                    ><input
+                      type="text"
+                      id="tesis-autor"
+                      placeholder="Nombre del tesista"
+                    />
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>ISBN/Código</label
+                    ><input
+                      type="text"
+                      id="tesis-isbn"
+                      placeholder="TESIS-2024-001"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Editorial/Universidad</label
+                    ><input
+                      type="text"
+                      id="tesis-editorial"
+                      placeholder="Universidad Católica de Cuenca"
+                    />
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Año</label
+                    ><input
+                      type="number"
+                      id="tesis-anio"
+                      min="1900"
+                      max="2099"
+                      placeholder="2024"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Área de Estudio</label
+                    ><input
+                      type="text"
+                      id="tesis-categoria"
+                      placeholder="Ingeniería, Medicina, etc."
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Cantidad Disponible *</label
+                  ><input
+                    type="number"
+                    id="tesis-stock"
+                    min="1"
+                    placeholder="1"
+                  />
+                </div>
+              </div>
+
+              <!-- FORMULARIO ARTICULO -->
+              <div
+                id="form-articulo"
+                class="form-content"
+                style="display: none"
+              >
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Título *</label
+                    ><input
+                      type="text"
+                      id="articulo-titulo"
+                      placeholder="Título del artículo"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Autor(es) *</label
+                    ><input
+                      type="text"
+                      id="articulo-autor"
+                      placeholder="Juan Pérez, María González"
+                    />
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>DOI/ISBN</label
+                    ><input
+                      type="text"
+                      id="articulo-isbn"
+                      placeholder="10.1234/example.2024"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Revista/Editorial</label
+                    ><input
+                      type="text"
+                      id="articulo-editorial"
+                      placeholder="Nombre de la revista"
+                    />
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Año</label
+                    ><input
+                      type="number"
+                      id="articulo-anio"
+                      min="1900"
+                      max="2099"
+                      placeholder="2024"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Área Temática</label
+                    ><input
+                      type="text"
+                      id="articulo-categoria"
+                      placeholder="Ciencias, Tecnología, etc."
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Cantidad Disponible *</label
+                  ><input
+                    type="number"
+                    id="articulo-stock"
+                    min="1"
+                    placeholder="3"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="btn-primary"
+                style="width: 100%; margin-top: 25px"
+              >
+                <i class="fas fa-save"></i> Registrar Material
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-prestamo" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-user-check"></i> Información del Usuario</h2>
+          <button class="close-modal" onclick="cerrarModalPrestamo()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="user-info-card">
+            <div class="user-info-row">
+              <strong>Nombre:</strong
+              ><span id="prestamo-usuario-nombre">--</span>
+            </div>
+            <div class="user-info-row">
+              <strong>Email:</strong><span id="prestamo-usuario-email">--</span>
+            </div>
+            <div class="user-info-row">
+              <strong>Carrera:</strong
+              ><span id="prestamo-usuario-carrera">--</span>
+            </div>
+          </div>
+          <form id="form-prestamo-modal" onsubmit="procesarPrestamo(event)">
+            <div class="form-group">
+              <label>Seleccionar Material *</label
+              ><select id="prestamo-material" required>
+                <option value="">-- Cargando... --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Días de préstamo (opcional, por defecto 7)</label
+              ><input
+                type="number"
+                id="prestamo-dias"
+                min="1"
+                max="30"
+                placeholder="7"
+              />
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%">
+              <i class="fas fa-check"></i> Registrar Préstamo
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-devolucion" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-undo-alt"></i> Préstamos Activos del Usuario</h2>
+          <button class="close-modal" onclick="cerrarModalDevolucion()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="user-info-card">
+            <div class="user-info-row">
+              <strong>Nombre:</strong
+              ><span id="devolucion-usuario-nombre">--</span>
+            </div>
+            <div class="user-info-row">
+              <strong>Email:</strong
+              ><span id="devolucion-usuario-email">--</span>
+            </div>
+            <div class="user-info-row">
+              <strong>Total Préstamos Activos:</strong
+              ><span id="devolucion-usuario-activos">0</span>
+            </div>
+          </div>
+          <div id="lista-prestamos-devolucion">
+            <p style="text-align: center; color: #999; padding: 20px">
+              Cargando préstamos...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-editar" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-edit"></i> Editar Material</h2>
+          <button class="close-modal" onclick="cerrarModalEditar()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="form-editar" onsubmit="actualizarMaterial(event)">
+            <input type="hidden" id="editar-id" />
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Título *</label
+                ><input type="text" id="editar-titulo" required />
+              </div>
+              <div class="form-group">
+                <label>Autor *</label
+                ><input type="text" id="editar-autor" required />
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>ISBN/Código</label><input type="text" id="editar-isbn" />
+              </div>
+              <div class="form-group">
+                <label>Editorial</label
+                ><input type="text" id="editar-editorial" />
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Año</label
+                ><input type="number" id="editar-anio" min="1900" max="2099" />
+              </div>
+              <div class="form-group">
+                <label>Categoría</label
+                ><input type="text" id="editar-categoria" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Stock Disponible *</label
+              ><input type="number" id="editar-stock" required min="0" />
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      console.log("🚀 Sistema Biblioteca RFID - Cargado");
+      const API_URL = "http://localhost:8080/api";
+      const token = localStorage.getItem("jwt_token");
+      if (!token) {
+        alert("Sesión expirada");
+        window.location.href = "../index.html";
+      }
+      function getHeaders() {
+        return {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        };
+      }
+      let prestamosCache = [],
+        usuarioActualCache = null,
+        currentUID = null;
+
+      function toggleSubmenu(id, menuItem) {
+        const submenu = document.getElementById(id);
+        const isOpen = submenu.style.display === "block";
+        document
+          .querySelectorAll(".submenu")
+          .forEach((s) => (s.style.display = "none"));
+        submenu.style.display = isOpen ? "none" : "block";
+      }
+
+      function cambiarVista(vistaNombre, elementoMenu) {
+        console.log("🔄 Cambiando a vista:", vistaNombre);
+        document.querySelectorAll(".view-section").forEach((el) => {
+          el.classList.remove("active");
+          el.style.display = "none";
+        });
+        const vista = document.getElementById("view-" + vistaNombre);
+        if (vista) {
+          vista.classList.add("active");
+          vista.style.display = "block";
+        }
+        document.querySelectorAll(".menu-item, .submenu-item").forEach((el) => {
+          el.classList.remove("active");
+        });
+        if (elementoMenu) {
+          elementoMenu.classList.add("active");
+        }
+        if (vistaNombre === "dashboard") cargarDashboard();
+        if (vistaNombre === "prestamos") cargarPrestamos();
+        if (vistaNombre === "devoluciones") cargarDevoluciones();
+      }
+
+      function logout() {
+        if (confirm("¿Cerrar sesión?")) {
+          localStorage.removeItem("jwt_token");
+          window.location.href = "../index.html";
+        }
+      }
+
+      async function cargarDashboard() {
+        console.log("📊 Cargando dashboard...");
+        try {
+          const resLibros = await fetch(`${API_URL}/biblioteca/libros`, {
+            headers: getHeaders(),
+          });
+          if (!resLibros.ok) throw new Error("Error al cargar libros");
+          const libros = await resLibros.json();
+          document.getElementById("stat-libros").textContent = libros.length;
+          const resPrestamos = await fetch(`${API_URL}/biblioteca/prestamos`, {
+            headers: getHeaders(),
+          });
+          if (!resPrestamos.ok) throw new Error("Error al cargar préstamos");
+          const prestamos = await resPrestamos.json();
+          const prestamosActivos = prestamos.filter(
+            (p) => p.estado === "PRESTADO",
+          );
+          document.getElementById("stat-prestamos").textContent =
+            prestamosActivos.length;
+          const hoy = new Date();
+          const vencidos = prestamosActivos.filter((p) => {
+            const fechaEst = new Date(p.fechaDevolucionEstimada);
+            return fechaEst < hoy;
+          });
+          document.getElementById("stat-vencidos").textContent =
+            vencidos.length;
+          try {
+            const resUsuarios = await fetch(`${API_URL}/usuarios`, {
+              headers: getHeaders(),
+            });
+            if (resUsuarios.ok) {
+              const usuarios = await resUsuarios.json();
+              const estudiantesActivos = usuarios.filter(
+                (u) =>
+                  u.rol &&
+                  u.rol.nombre === "ROLE_ESTUDIANTE" &&
+                  u.activo === true,
+              );
+              document.getElementById("stat-usuarios").textContent =
+                estudiantesActivos.length;
+            } else {
+              document.getElementById("stat-usuarios").textContent = "N/A";
+            }
+          } catch (error) {
+            document.getElementById("stat-usuarios").textContent = "N/A";
+          }
+          const tbody = document.getElementById("tabla-actividad");
+          if (prestamos.length === 0) {
+            tbody.innerHTML =
+              '<tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">No hay actividad reciente</td></tr>';
+          } else {
+            const ultimos = prestamos.slice(0, 5);
+            tbody.innerHTML = ultimos
+              .map((p) => {
+                const usuarioNombre =
+                  p.usuario && p.usuario.nombreCompleto
+                    ? p.usuario.nombreCompleto
+                    : "Usuario desconocido";
+                const libroTitulo =
+                  p.libro && p.libro.titulo
+                    ? p.libro.titulo
+                    : "Material desconocido";
+                const tipoMaterial =
+                  p.libro && p.libro.tipoMaterial
+                    ? p.libro.tipoMaterial
+                    : "LIBRO";
+                const fechaPrestamo = p.fechaPrestamo
+                  ? new Date(p.fechaPrestamo).toLocaleDateString("es-EC")
+                  : "--";
+                const estado = p.estado === "DEVUELTO" ? "Devuelto" : "Activo";
+                const badge =
+                  p.estado === "DEVUELTO" ? "bg-success" : "bg-warning";
+                return `<tr><td>${fechaPrestamo}</td><td>${usuarioNombre}</td><td>${libroTitulo}</td><td><span class="badge bg-info">${tipoMaterial}</span></td><td><span class="badge ${badge}">${estado}</span></td></tr>`;
+              })
+              .join("");
+          }
+          console.log("✅ Dashboard cargado");
+        } catch (error) {
+          console.error("❌ Error al cargar dashboard:", error);
+          alert("Error al cargar el dashboard");
+        }
+      }
+
+      async function buscarMaterial(tipo) {
+        const inputId =
+          tipo === "LIBRO"
+            ? "buscar-libro"
+            : tipo === "TESIS"
+              ? "buscar-tesis"
+              : "buscar-articulo";
+        const resultadoId =
+          tipo === "LIBRO"
+            ? "resultados-libros"
+            : tipo === "TESIS"
+              ? "resultados-tesis"
+              : "resultados-articulos";
+        const busqueda = document.getElementById(inputId).value.trim();
+        const contenedor = document.getElementById(resultadoId);
+        if (busqueda.length < 2) {
+          contenedor.innerHTML =
+            '<p style="text-align:center;padding:30px;color:#999;">Escribe al menos 2 caracteres...</p>';
+          return;
+        }
+        try {
+          console.log(`🔍 Buscando ${tipo} con texto: "${busqueda}"`);
+          const res = await fetch(`${API_URL}/biblioteca/libros`, {
+            headers: getHeaders(),
+          });
+          if (!res.ok) {
+            console.error("❌ Error - Status:", res.status);
+            throw new Error("Error al cargar materiales");
+          }
+          let todosLosMateriales = await res.json();
+          console.log(
+            `📚 Total materiales: ${todosLosMateriales.length}`,
+            todosLosMateriales,
+          );
+          const tiposBusqueda = {
+            LIBRO: ["Libro Tapa Blanda", "Libro Tapa Dura", "Libro", "LIBRO"],
+            TESIS: ["Tesis", "TESIS"],
+            ARTICULO: ["Articulo", "Artículo", "ARTICULO"],
+          };
+          let materialesPorTipo = todosLosMateriales.filter((m) => {
+            const tipoMaterial = m.tipo_material || m.tipoMaterial || "";
+            return tiposBusqueda[tipo].some((t) => tipoMaterial.includes(t));
+          });
+          console.log(
+            `📌 Materiales tipo ${tipo}: ${materialesPorTipo.length}`,
+          );
+          const textoBusqueda = busqueda.toLowerCase();
+          let materiales = materialesPorTipo.filter((m) => {
+            const titulo = m.titulo ? m.titulo.toLowerCase() : "";
+            const autor = m.autor ? m.autor.toLowerCase() : "";
+            const isbn = m.isbn ? m.isbn.toLowerCase() : "";
+            const categoria = m.categoria ? m.categoria.toLowerCase() : "";
+            const editorial = m.editorial ? m.editorial.toLowerCase() : "";
+            return (
+              titulo.includes(textoBusqueda) ||
+              autor.includes(textoBusqueda) ||
+              isbn.includes(textoBusqueda) ||
+              categoria.includes(textoBusqueda) ||
+              editorial.includes(textoBusqueda)
+            );
+          });
+          console.log(`✅ Resultados encontrados: ${materiales.length}`);
+          if (materiales.length === 0) {
+            contenedor.innerHTML = `<p style="text-align:center;padding:30px;color:#999;">No se encontraron ${tipo === "LIBRO" ? "libros" : tipo === "TESIS" ? "tesis" : "artículos"} con "<strong>${busqueda}</strong>"</p>`;
+            return;
+          }
+          contenedor.innerHTML = materiales
+            .map((m) => {
+              let codigo = m.isbn || "--";
+              let extra = m.editorial || "--";
+              let stockDisponible =
+                m.stock_disponible || m.stockDisponible || m.stock || 0;
+              let ubicacion = m.ubicacion || "Sin ubicación";
+              const materialId = m.id || m.id_libro;
+              return `<div style="background:white;padding:25px;border-radius:15px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-left:5px solid var(--primary);"><h3 style="color:var(--bg-dark);margin-bottom:10px;font-size:20px;">${m.titulo}</h3><p style="margin:5px 0;color:#666;"><strong>Autor:</strong> ${m.autor || "--"}</p>${codigo !== "--" ? `<p style="margin:5px 0;color:#666;"><strong>${tipo === "LIBRO" ? "ISBN" : tipo === "TESIS" ? "Código" : "DOI"}:</strong> ${codigo}</p>` : ""}${extra !== "--" ? `<p style="margin:5px 0;color:#666;"><strong>${tipo === "LIBRO" ? "Editorial" : tipo === "TESIS" ? "Universidad" : "Revista"}:</strong> ${extra}</p>` : ""}${m.anio ? `<p style="margin:5px 0;color:#666;"><strong>Año:</strong> ${m.anio}</p>` : ""}${m.categoria ? `<p style="margin:5px 0;color:#666;"><strong>Categoría:</strong> ${m.categoria}</p>` : ""}
+<p style="margin:5px 0;color:#666;"><strong>Ubicación:</strong> ${ubicacion}</p><p style="margin:10px 0 0 0;"><span style="background:${stockDisponible > 0 ? "#d4edda" : "#f8d7da"};color:${stockDisponible > 0 ? "#155724" : "#721c24"};padding:8px 15px;border-radius:20px;font-weight:bold;font-size:14px;">${stockDisponible > 0 ? `✓ ${stockDisponible} disponibles` : "✗ No disponible"}</span></p><div class="action-buttons"><button class="btn-edit" onclick='abrirModalEditar(${JSON.stringify(m).replace(/'/g, "\\'")})'><i class="fas fa-edit"></i> Editar</button><button class="btn-delete" onclick="eliminarMaterial(${materialId})"><i class="fas fa-trash"></i> Eliminar</button></div></div>`;
+            })
+            .join("");
+          console.log(`✅ ${materiales.length} resultados mostrados`);
+        } catch (error) {
+          console.error("❌ Error en búsqueda:", error);
+          contenedor.innerHTML =
+            '<p style="text-align:center;padding:30px;color:#e74c3c;">Error al realizar la búsqueda</p>';
+        }
+      }
+
+      function cambiarTab(categoria, event) {
+        event.preventDefault();
+        document
+          .querySelectorAll(".tab-button")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.closest(".tab-button").classList.add("active");
+        document
+          .querySelectorAll(".form-content")
+          .forEach((form) => (form.style.display = "none"));
+        document.getElementById(
+          `form-${categoria.toLowerCase()}`,
+        ).style.display = "block";
+        document.getElementById("material-categoria").value = categoria;
+        console.log(`✅ Tab cambiado a: ${categoria}`);
+      }
+
+      async function guardarMaterial(event) {
+        event.preventDefault();
+        const categoria = document.getElementById("material-categoria").value;
+        console.log(`💾 Guardando material tipo: ${categoria}`);
+
+        let material = {};
+
+        if (categoria === "LIBRO") {
+          const titulo = document.getElementById("libro-titulo").value.trim();
+          const autor = document.getElementById("libro-autor").value.trim();
+          const stockValue = document.getElementById("libro-stock").value;
+
+          if (!titulo || !autor || !stockValue) {
+            alert(
+              "⚠️ Complete los campos obligatorios:\n- Título\n- Autor\n- Stock",
+            );
+            return;
+          }
+
+          const stock = parseInt(stockValue);
+          if (stock < 1) {
+            alert("⚠️ El stock debe ser al menos 1");
+            return;
+          }
+
+          material = {
+            titulo: titulo,
+            autor: autor,
+            isbn: document.getElementById("libro-isbn").value.trim() || null,
+            editorial:
+              document.getElementById("libro-editorial").value.trim() || null,
+            anio: document.getElementById("libro-anio").value
+              ? parseInt(document.getElementById("libro-anio").value)
+              : null,
+            categoria:
+              document.getElementById("libro-categoria").value.trim() || null,
+            tipo_material: "Libro Tapa Blanda",
+            stock: stock,
+            stock_total: stock,
+            stock_disponible: stock,
+            ubicacion: "Estante A-45",
+            disponible: 1,
+          };
+        } else if (categoria === "TESIS") {
+          const titulo = document.getElementById("tesis-titulo").value.trim();
+          const autor = document.getElementById("tesis-autor").value.trim();
+          const stockValue = document.getElementById("tesis-stock").value;
+
+          if (!titulo || !autor || !stockValue) {
+            alert(
+              "⚠️ Complete los campos obligatorios:\n- Título\n- Autor\n- Stock",
+            );
+            return;
+          }
+
+          const stock = parseInt(stockValue);
+          if (stock < 1) {
+            alert("⚠️ El stock debe ser al menos 1");
+            return;
+          }
+
+          material = {
+            titulo: titulo,
+            autor: autor,
+            isbn: document.getElementById("tesis-isbn").value.trim() || null,
+            editorial:
+              document.getElementById("tesis-editorial").value.trim() || null,
+            anio: document.getElementById("tesis-anio").value
+              ? parseInt(document.getElementById("tesis-anio").value)
+              : null,
+            categoria:
+              document.getElementById("tesis-categoria").value.trim() || null,
+            tipo_material: "Tesis",
+            stock: stock,
+            stock_total: stock,
+            stock_disponible: stock,
+            ubicacion: "Estante T-01",
+            disponible: 1,
+          };
+        } else if (categoria === "ARTICULO") {
+          const titulo = document
+            .getElementById("articulo-titulo")
+            .value.trim();
+          const autor = document.getElementById("articulo-autor").value.trim();
+          const stockValue = document.getElementById("articulo-stock").value;
+
+          if (!titulo || !autor || !stockValue) {
+            alert(
+              "⚠️ Complete los campos obligatorios:\n- Título\n- Autor\n- Stock",
+            );
+            return;
+          }
+
+          const stock = parseInt(stockValue);
+          if (stock < 1) {
+            alert("⚠️ El stock debe ser al menos 1");
+            return;
+          }
+
+          material = {
+            titulo: titulo,
+            autor: autor,
+            isbn: document.getElementById("articulo-isbn").value.trim() || null,
+            editorial:
+              document.getElementById("articulo-editorial").value.trim() ||
+              null,
+            anio: document.getElementById("articulo-anio").value
+              ? parseInt(document.getElementById("articulo-anio").value)
+              : null,
+            categoria:
+              document.getElementById("articulo-categoria").value.trim() ||
+              null,
+            tipo_material: "Articulo",
+            stock: stock,
+            stock_total: stock,
+            stock_disponible: stock,
+            ubicacion: "Estante AR-01",
+            disponible: 1,
+          };
+        }
+
+        console.log("📤 Datos a enviar:", JSON.stringify(material, null, 2));
+
+        try {
+          const res = await fetch(`${API_URL}/biblioteca/libros`, {
+            method: "POST",
+            headers: getHeaders(),
+            body: JSON.stringify(material),
+          });
+
+          console.log("📥 Respuesta - Status:", res.status, res.statusText);
+
+          if (!res.ok) {
+            let errorMsg = "Error al guardar";
+            const contentType = res.headers.get("content-type");
+
+            if (contentType && contentType.includes("application/json")) {
+              const errorData = await res.json();
+              console.error("❌ Error JSON:", errorData);
+              errorMsg =
+                errorData.message || errorData.error || `Error ${res.status}`;
+            } else {
+              const errorText = await res.text();
+              console.error("❌ Error texto:", errorText);
+              errorMsg = `Error ${res.status}: ${errorText.substring(0, 100)}`;
+            }
+
+            throw new Error(errorMsg);
+          }
+
+          const resultado = await res.json();
+          console.log("✅ Material guardado exitosamente:", resultado);
+
+          alert(
+            `✅ ${categoria} "${material.titulo}" registrado correctamente`,
+          );
+
+          // Limpiar formulario
+          document.getElementById("form-material").reset();
+          document.getElementById("material-categoria").value = "LIBRO";
+          document
+            .querySelectorAll(".tab-button")
+            .forEach((btn) => btn.classList.remove("active"));
+          document.querySelector(".tab-button").classList.add("active");
+          document
+            .querySelectorAll(".form-content")
+            .forEach((form) => (form.style.display = "none"));
+          document.getElementById("form-libro").style.display = "block";
+        } catch (error) {
+          console.error("❌ Error completo:", error);
+          alert(`❌ ${error.message}`);
+        }
+      }
+
+      function abrirModalEditar(material) {
+        console.log("📝 Editando material:", material);
+        document.getElementById("editar-id").value =
+          material.id || material.id_libro;
+        document.getElementById("editar-titulo").value = material.titulo || "";
+        document.getElementById("editar-autor").value = material.autor || "";
+        document.getElementById("editar-isbn").value = material.isbn || "";
+        document.getElementById("editar-editorial").value =
+          material.editorial || "";
+        document.getElementById("editar-anio").value = material.anio || "";
+        document.getElementById("editar-categoria").value =
+          material.categoria || "";
+        document.getElementById("editar-stock").value =
+          material.stock_disponible ||
+          material.stockDisponible ||
+          material.stock ||
+          0;
+        document.getElementById("modal-editar").classList.add("active");
+      }
+
+      function cerrarModalEditar() {
+        document.getElementById("modal-editar").classList.remove("active");
+        document.getElementById("form-editar").reset();
+      }
+
+      async function actualizarMaterial(event) {
+        event.preventDefault();
+        const id = document.getElementById("editar-id").value;
+        const materialActualizado = {
+          titulo: document.getElementById("editar-titulo").value.trim(),
+          autor: document.getElementById("editar-autor").value.trim(),
+          isbn: document.getElementById("editar-isbn").value.trim() || null,
+          editorial:
+            document.getElementById("editar-editorial").value.trim() || null,
+          anio: document.getElementById("editar-anio").value
+            ? parseInt(document.getElementById("editar-anio").value)
+            : null,
+          categoria:
+            document.getElementById("editar-categoria").value.trim() || null,
+          stock_disponible: parseInt(
+            document.getElementById("editar-stock").value,
+          ),
+          stock: parseInt(document.getElementById("editar-stock").value),
+        };
+        console.log("📤 Actualizando material ID:", id, materialActualizado);
+        try {
+          const res = await fetch(`${API_URL}/biblioteca/libros/${id}`, {
+            method: "PUT",
+            headers: getHeaders(),
+            body: JSON.stringify(materialActualizado),
+          });
+          if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Error ${res.status}: ${errorText}`);
+          }
+          const resultado = await res.json();
+          console.log("✅ Material actualizado:", resultado);
+          alert(
+            `✅ Material "${materialActualizado.titulo}" actualizado correctamente`,
+          );
+          cerrarModalEditar();
+          const inputBusqueda = document.querySelector(
+            "#buscar-libro, #buscar-tesis, #buscar-articulo",
+          );
+          if (inputBusqueda && inputBusqueda.value.length >= 2) {
+            const tipo = inputBusqueda.id.includes("libro")
+              ? "LIBRO"
+              : inputBusqueda.id.includes("tesis")
+                ? "TESIS"
+                : "ARTICULO";
+            buscarMaterial(tipo);
+          }
+        } catch (error) {
+          console.error("❌ Error al actualizar:", error);
+          alert(`❌ Error al actualizar el material:\n\n${error.message}`);
+        }
+      }
+
+      async function eliminarMaterial(id) {
+        if (
+          !confirm(
+            "⚠️ ¿Estás seguro de eliminar este material?\n\nEsta acción NO se puede deshacer.",
+          )
+        ) {
+          return;
+        }
+        console.log("🗑️ Eliminando material ID:", id);
+        try {
+          const res = await fetch(`${API_URL}/biblioteca/libros/${id}`, {
+            method: "DELETE",
+            headers: getHeaders(),
+          });
+          if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Error ${res.status}: ${errorText}`);
+          }
+          console.log("✅ Material eliminado correctamente");
+          alert("✅ Material eliminado correctamente");
+          const inputBusqueda = document.querySelector(
+            "#buscar-libro, #buscar-tesis, #buscar-articulo",
+          );
+          if (inputBusqueda && inputBusqueda.value.length >= 2) {
+            const tipo = inputBusqueda.id.includes("libro")
+              ? "LIBRO"
+              : inputBusqueda.id.includes("tesis")
+                ? "TESIS"
+                : "ARTICULO";
+            buscarMaterial(tipo);
+          }
+        } catch (error) {
+          console.error("❌ Error al eliminar:", error);
+          alert(`❌ Error al eliminar el material:\n\n${error.message}`);
+        }
+      }
+
+      async function abrirModalPrestamo() {
+        const uid = document.getElementById("rfid-prestamo").value.trim();
+        if (!uid) {
+          alert("⚠️ Ingresa un UID válido");
+          return;
+        }
+        try {
+          const resUsuarios = await fetch(`${API_URL}/usuarios`, {
+            headers: getHeaders(),
+          });
+          if (!resUsuarios.ok) throw new Error("Error al cargar usuarios");
+          const usuarios = await resUsuarios.json();
+          const usuario = usuarios.find(
+            (u) => u.tarjeta && u.tarjeta.tarjetaUid === uid,
+          );
+          if (!usuario) {
+            alert("❌ Usuario no encontrado con ese UID");
+            return;
+          }
+          document.getElementById("prestamo-usuario-nombre").textContent =
+            usuario.nombreCompleto || "Sin nombre";
+          document.getElementById("prestamo-usuario-email").textContent =
+            usuario.email || "Sin email";
+          document.getElementById("prestamo-usuario-carrera").textContent =
+            usuario.carrera || "Sin carrera";
+          usuarioActualCache = usuario;
+          currentUID = uid;
+          const resLibros = await fetch(`${API_URL}/biblioteca/libros`, {
+            headers: getHeaders(),
+          });
+          if (!resLibros.ok) throw new Error("Error al cargar libros");
+          const libros = await resLibros.json();
+          const disponibles = libros.filter((l) => {
+            const stock =
+              l.stock_disponible || l.stockDisponible || l.stock || 0;
+            return stock > 0;
+          });
+          const select = document.getElementById("prestamo-material");
+          select.innerHTML = '<option value="">-- Seleccionar --</option>';
+          disponibles.forEach((l) => {
+            const libroId = l.id || l.id_libro;
+            const titulo = l.titulo || "Sin título";
+            const tipo = l.tipo_material || l.tipoMaterial || "Material";
+            const stock =
+              l.stock_disponible || l.stockDisponible || l.stock || 0;
+            select.innerHTML += `<option value="${libroId}">${titulo} (${tipo}) - ${stock} disponibles</option>`;
+          });
+          document.getElementById("modal-prestamo").classList.add("active");
+        } catch (error) {
+          console.error("❌ Error:", error);
+          alert(`❌ Error: ${error.message}`);
+        }
+      }
+
+      function cerrarModalPrestamo() {
+        document.getElementById("modal-prestamo").classList.remove("active");
+        document.getElementById("rfid-prestamo").value = "";
+        document.getElementById("form-prestamo-modal").reset();
+        usuarioActualCache = null;
+      }
+
+      async function procesarPrestamo(event) {
+        event.preventDefault();
+        if (!usuarioActualCache || !currentUID) {
+          alert("❌ Error: no hay usuario seleccionado");
+          return;
+        }
+        const materialId = document.getElementById("prestamo-material").value;
+        const dias = document.getElementById("prestamo-dias").value || 7;
+        if (!materialId || materialId === "") {
+          alert("⚠️ Selecciona un material");
+          return;
+        }
+        console.log(
+          `📤 Registrando préstamo: UID=${currentUID}, LibroID=${materialId}, Días=${dias}`,
+        );
+        try {
+          const url = `${API_URL}/biblioteca/prestamos?uid=${currentUID}&idLibro=${materialId}&dias=${dias}`;
+          console.log("🔗 URL:", url);
+          const res = await fetch(url, {
+            method: "POST",
+            headers: getHeaders(),
+          });
+          console.log("📥 Respuesta:", res.status, res.statusText);
+          if (!res.ok) {
+            let errorMsg = "Error al registrar préstamo";
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              const error = await res.json();
+              errorMsg = error.error || error.message || `Error ${res.status}`;
+            } else {
+              const errorText = await res.text();
+              errorMsg = errorText.substring(0, 200) || `Error ${res.status}`;
+            }
+            throw new Error(errorMsg);
+          }
+          const prestamo = await res.json();
+          console.log("✅ Préstamo registrado:", prestamo);
+          alert(`✅ Préstamo registrado correctamente`);
+          cerrarModalPrestamo();
+          cargarPrestamos();
+        } catch (error) {
+          console.error("❌ Error:", error);
+          alert(`❌ ${error.message}`);
+        }
+      }
+
+      async function cargarPrestamos() {
+        try {
+          const res = await fetch(`${API_URL}/biblioteca/prestamos`, {
+            headers: getHeaders(),
+          });
+          if (!res.ok) throw new Error("Error al cargar préstamos");
+          const prestamos = await res.json();
+          const prestamosActivos = prestamos.filter(
+            (p) => p.estado === "PRESTADO",
+          );
+          prestamosCache = prestamosActivos;
+          const tbody = document.getElementById("tabla-prestamos");
+          document.getElementById("contador-prestamos").textContent =
+            prestamosActivos.length;
+          if (prestamosActivos.length === 0) {
+            tbody.innerHTML =
+              '<tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">No hay préstamos activos</td></tr>';
+            return;
+          }
+          const hoy = new Date();
+          tbody.innerHTML = prestamosActivos
+            .map((p) => {
+              const fechaEst = new Date(p.fechaDevolucionEstimada);
+              const vencido = fechaEst < hoy;
+              return `<tr><td><strong>#${p.id}</strong></td><td>${p.usuario.nombreCompleto}</td><td style="font-weight:600;">${p.libro.titulo}</td><td>${new Date(p.fechaPrestamo).toLocaleDateString("es-EC")}</td><td>${new Date(p.fechaDevolucionEstimada).toLocaleDateString("es-EC")}</td><td><span class="badge ${vencido ? "bg-danger" : "bg-success"}">${vencido ? "Vencido" : "Activo"}</span></td></tr>`;
+            })
+            .join("");
+        } catch (error) {
+          console.error("❌ Error:", error);
+        }
+      }
+
+      function filtrarPrestamos() {
+        const busqueda = document
+          .getElementById("buscar-prestamo")
+          .value.toLowerCase();
+        const tbody = document.getElementById("tabla-prestamos");
+        const filtrados = prestamosCache.filter(
+          (p) =>
+            p.usuario.nombreCompleto.toLowerCase().includes(busqueda) ||
+            p.libro.titulo.toLowerCase().includes(busqueda) ||
+            p.id.toString().includes(busqueda),
+        );
+        if (filtrados.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">No se encontraron resultados</td></tr>';
+          return;
+        }
+        const hoy = new Date();
+        tbody.innerHTML = filtrados
+          .map((p) => {
+            const fechaEst = new Date(p.fechaDevolucionEstimada);
+            const vencido = fechaEst < hoy;
+            return `<tr><td><strong>#${p.id}</strong></td><td>${p.usuario.nombreCompleto}</td><td style="font-weight:600;">${p.libro.titulo}</td><td>${new Date(p.fechaPrestamo).toLocaleDateString("es-EC")}</td><td>${new Date(p.fechaDevolucionEstimada).toLocaleDateString("es-EC")}</td><td><span class="badge ${vencido ? "bg-danger" : "bg-success"}">${vencido ? "Vencido" : "Activo"}</span></td></tr>`;
+          })
+          .join("");
+      }
+
+      async function abrirModalDevolucion() {
+        const uid = document.getElementById("rfid-devolucion").value.trim();
+        if (!uid) {
+          alert("⚠️ Ingresa un UID válido");
+          return;
+        }
+        try {
+          const resUsuarios = await fetch(`${API_URL}/usuarios`, {
+            headers: getHeaders(),
+          });
+          if (!resUsuarios.ok) throw new Error("Error al cargar usuarios");
+          const usuarios = await resUsuarios.json();
+          const usuario = usuarios.find(
+            (u) => u.tarjeta && u.tarjeta.tarjetaUid === uid,
+          );
+          if (!usuario) {
+            alert("❌ Usuario no encontrado con ese UID");
+            return;
+          }
+          const resPrestamos = await fetch(`${API_URL}/biblioteca/prestamos`, {
+            headers: getHeaders(),
+          });
+          if (!resPrestamos.ok) throw new Error("Error al cargar préstamos");
+          const todosPrestamos = await resPrestamos.json();
+          const prestamosUsuario = todosPrestamos.filter(
+            (p) => p.usuario.id === usuario.id && p.estado === "PRESTADO",
+          );
+          if (prestamosUsuario.length === 0) {
+            alert("ℹ️ Este usuario no tiene préstamos activos");
+            return;
+          }
+          document.getElementById("devolucion-usuario-nombre").textContent =
+            usuario.nombreCompleto || "Sin nombre";
+          document.getElementById("devolucion-usuario-email").textContent =
+            usuario.email || "Sin email";
+          document.getElementById("devolucion-usuario-activos").textContent =
+            prestamosUsuario.length;
+          const lista = document.getElementById("lista-prestamos-devolucion");
+          lista.innerHTML = prestamosUsuario
+            .map((p) => {
+              const dias = Math.floor(
+                (new Date() - new Date(p.fechaPrestamo)) /
+                  (1000 * 60 * 60 * 24),
+              );
+              return `<div style="background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:15px;border-left:4px solid var(--primary);"><h4 style="margin-bottom:10px;color:var(--bg-dark);">${p.libro.titulo}</h4><p style="margin:5px 0;color:#666;"><strong>Tipo:</strong> ${p.libro.tipoMaterial || "LIBRO"}</p><p style="margin:5px 0;color:#666;"><strong>Fecha Préstamo:</strong> ${new Date(p.fechaPrestamo).toLocaleDateString("es-EC")}</p><p style="margin:5px 0;color:#666;"><strong>Días transcurridos:</strong> ${dias}</p><button onclick="procesarDevolucion(${p.id})" class="btn-primary" style="width:100%;margin-top:15px;background:var(--success);"><i class="fas fa-check-circle"></i> Marcar como Devuelto</button></div>`;
+            })
+            .join("");
+          document.getElementById("modal-devolucion").classList.add("active");
+        } catch (error) {
+          console.error("❌ Error:", error);
+          alert("❌ Error al buscar préstamos del usuario");
+        }
+      }
+
+      function cerrarModalDevolucion() {
+        document.getElementById("modal-devolucion").classList.remove("active");
+        document.getElementById("rfid-devolucion").value = "";
+      }
+
+      async function procesarDevolucion(prestamoId) {
+        if (!confirm("¿Confirmar devolución de este material?")) return;
+        try {
+          const res = await fetch(
+            `${API_URL}/biblioteca/devoluciones/${prestamoId}`,
+            { method: "POST", headers: getHeaders() },
+          );
+          if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.error || "Error al procesar devolución");
+          }
+          const resultado = await res.json();
+          alert(
+            `✅ ${resultado.mensaje || "Devolución registrada correctamente"}`,
+          );
+          cerrarModalDevolucion();
+          cargarDevoluciones();
+        } catch (error) {
+          console.error("❌ Error:", error);
+          alert(`❌ ${error.message}`);
+        }
+      }
+
+      async function cargarDevoluciones() {
+        try {
+          const res = await fetch(`${API_URL}/biblioteca/prestamos`, {
+            headers: getHeaders(),
+          });
+          if (!res.ok) throw new Error("Error al cargar devoluciones");
+          const prestamos = await res.json();
+          const devoluciones = prestamos
+            .filter((p) => p.estado === "DEVUELTO")
+            .slice(0, 10);
+          const tbody = document.getElementById("tabla-devoluciones");
+          if (devoluciones.length === 0) {
+            tbody.innerHTML =
+              '<tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">No hay devoluciones registradas</td></tr>';
+            return;
+          }
+          tbody.innerHTML = devoluciones
+            .map((d) => {
+              const fechaDev = d.fechaDevolucionReal
+                ? new Date(d.fechaDevolucionReal)
+                : new Date();
+              const fechaEst = new Date(d.fechaDevolucionEstimada);
+              const aTiempo = fechaDev <= fechaEst;
+              return `<tr><td><strong>#${d.id}</strong></td><td>${d.usuario.nombreCompleto}</td><td>${d.libro.titulo}</td><td>${new Date(d.fechaPrestamo).toLocaleDateString("es-EC")}</td><td><strong>${fechaDev.toLocaleDateString("es-EC")}</strong></td><td><span class="badge ${aTiempo ? "bg-success" : "bg-warning"}">${aTiempo ? "A tiempo" : "Con retraso"}</span></td></tr>`;
+            })
+            .join("");
+        } catch (error) {
+          console.error("❌ Error:", error);
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        console.log("✅ Sistema Biblioteca RFID - Inicializado");
+        setTimeout(() => {
+          cargarDashboard();
+        }, 500);
+      });
+      if (document.readyState !== "loading") {
+        setTimeout(() => {
+          cargarDashboard();
+        }, 500);
+      }
+    </script>
+  </body>
+</html>
