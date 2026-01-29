@@ -1007,7 +1007,7 @@
     </div>
 
     <script>
-      console.log("🚀 Sistema Biblioteca RFID - Cargado");
+      console.log(" Sistema Biblioteca RFID - Cargado");
       const API_URL = "http://localhost:8080/api";
       const token = localStorage.getItem("jwt_token");
       if (!token) {
@@ -1034,7 +1034,7 @@
       }
 
       function cambiarVista(vistaNombre, elementoMenu) {
-        console.log("🔄 Cambiando a vista:", vistaNombre);
+        console.log(" Cambiando a vista:", vistaNombre);
         document.querySelectorAll(".view-section").forEach((el) => {
           el.classList.remove("active");
           el.style.display = "none";
@@ -1063,7 +1063,7 @@
       }
 
       async function cargarDashboard() {
-        console.log("📊 Cargando dashboard...");
+        console.log(" Cargando dashboard...");
         try {
           const resLibros = await fetch(`${API_URL}/biblioteca/libros`, {
             headers: getHeaders(),
@@ -1138,9 +1138,9 @@
               })
               .join("");
           }
-          console.log("✅ Dashboard cargado");
+          console.log(" Dashboard cargado");
         } catch (error) {
-          console.error("❌ Error al cargar dashboard:", error);
+          console.error(" Error al cargar dashboard:", error);
           alert("Error al cargar el dashboard");
         }
       }
@@ -1166,17 +1166,17 @@
           return;
         }
         try {
-          console.log(`🔍 Buscando ${tipo} con texto: "${busqueda}"`);
+          console.log(` Buscando ${tipo} con texto: "${busqueda}"`);
           const res = await fetch(`${API_URL}/biblioteca/libros`, {
             headers: getHeaders(),
           });
           if (!res.ok) {
-            console.error("❌ Error - Status:", res.status);
+            console.error(" Error - Status:", res.status);
             throw new Error("Error al cargar materiales");
           }
           let todosLosMateriales = await res.json();
           console.log(
-            `📚 Total materiales: ${todosLosMateriales.length}`,
+            ` Total materiales: ${todosLosMateriales.length}`,
             todosLosMateriales,
           );
           const tiposBusqueda = {
@@ -1189,7 +1189,7 @@
             return tiposBusqueda[tipo].some((t) => tipoMaterial.includes(t));
           });
           console.log(
-            `📌 Materiales tipo ${tipo}: ${materialesPorTipo.length}`,
+            ` Materiales tipo ${tipo}: ${materialesPorTipo.length}`,
           );
           const textoBusqueda = busqueda.toLowerCase();
           let materiales = materialesPorTipo.filter((m) => {
@@ -1206,7 +1206,7 @@
               editorial.includes(textoBusqueda)
             );
           });
-          console.log(`✅ Resultados encontrados: ${materiales.length}`);
+          console.log(` Resultados encontrados: ${materiales.length}`);
           if (materiales.length === 0) {
             contenedor.innerHTML = `<p style="text-align:center;padding:30px;color:#999;">No se encontraron ${tipo === "LIBRO" ? "libros" : tipo === "TESIS" ? "tesis" : "artículos"} con "<strong>${busqueda}</strong>"</p>`;
             return;
@@ -1223,9 +1223,9 @@
 <p style="margin:5px 0;color:#666;"><strong>Ubicación:</strong> ${ubicacion}</p><p style="margin:10px 0 0 0;"><span style="background:${stockDisponible > 0 ? "#d4edda" : "#f8d7da"};color:${stockDisponible > 0 ? "#155724" : "#721c24"};padding:8px 15px;border-radius:20px;font-weight:bold;font-size:14px;">${stockDisponible > 0 ? `✓ ${stockDisponible} disponibles` : "✗ No disponible"}</span></p><div class="action-buttons"><button class="btn-edit" onclick='abrirModalEditar(${JSON.stringify(m).replace(/'/g, "\\'")})'><i class="fas fa-edit"></i> Editar</button><button class="btn-delete" onclick="eliminarMaterial(${materialId})"><i class="fas fa-trash"></i> Eliminar</button></div></div>`;
             })
             .join("");
-          console.log(`✅ ${materiales.length} resultados mostrados`);
+          console.log(` ${materiales.length} resultados mostrados`);
         } catch (error) {
-          console.error("❌ Error en búsqueda:", error);
+          console.error(" Error en búsqueda:", error);
           contenedor.innerHTML =
             '<p style="text-align:center;padding:30px;color:#e74c3c;">Error al realizar la búsqueda</p>';
         }
@@ -1244,13 +1244,13 @@
           `form-${categoria.toLowerCase()}`,
         ).style.display = "block";
         document.getElementById("material-categoria").value = categoria;
-        console.log(`✅ Tab cambiado a: ${categoria}`);
+        console.log(` Tab cambiado a: ${categoria}`);
       }
 
       async function guardarMaterial(event) {
         event.preventDefault();
         const categoria = document.getElementById("material-categoria").value;
-        console.log(`💾 Guardando material tipo: ${categoria}`);
+        console.log(` Guardando material tipo: ${categoria}`);
 
         let material = {};
 
@@ -1261,14 +1261,14 @@
 
           if (!titulo || !autor || !stockValue) {
             alert(
-              "⚠️ Complete los campos obligatorios:\n- Título\n- Autor\n- Stock",
+              " Complete los campos obligatorios:\n- Título\n- Autor\n- Stock",
             );
             return;
           }
 
           const stock = parseInt(stockValue);
           if (stock < 1) {
-            alert("⚠️ El stock debe ser al menos 1");
+            alert(" El stock debe ser al menos 1");
             return;
           }
 
@@ -1297,14 +1297,14 @@
 
           if (!titulo || !autor || !stockValue) {
             alert(
-              "⚠️ Complete los campos obligatorios:\n- Título\n- Autor\n- Stock",
+              " Complete los campos obligatorios:\n- Título\n- Autor\n- Stock",
             );
             return;
           }
 
           const stock = parseInt(stockValue);
           if (stock < 1) {
-            alert("⚠️ El stock debe ser al menos 1");
+            alert(" El stock debe ser al menos 1");
             return;
           }
 
@@ -1335,14 +1335,14 @@
 
           if (!titulo || !autor || !stockValue) {
             alert(
-              "⚠️ Complete los campos obligatorios:\n- Título\n- Autor\n- Stock",
+              " Complete los campos obligatorios:\n- Título\n- Autor\n- Stock",
             );
             return;
           }
 
           const stock = parseInt(stockValue);
           if (stock < 1) {
-            alert("⚠️ El stock debe ser al menos 1");
+            alert(" El stock debe ser al menos 1");
             return;
           }
 
@@ -1368,7 +1368,7 @@
           };
         }
 
-        console.log("📤 Datos a enviar:", JSON.stringify(material, null, 2));
+        console.log(" Datos a enviar:", JSON.stringify(material, null, 2));
 
         try {
           const res = await fetch(`${API_URL}/biblioteca/libros`, {
@@ -1377,7 +1377,7 @@
             body: JSON.stringify(material),
           });
 
-          console.log("📥 Respuesta - Status:", res.status, res.statusText);
+          console.log(" Respuesta - Status:", res.status, res.statusText);
 
           if (!res.ok) {
             let errorMsg = "Error al guardar";
@@ -1398,10 +1398,10 @@
           }
 
           const resultado = await res.json();
-          console.log("✅ Material guardado exitosamente:", resultado);
+          console.log(" Material guardado exitosamente:", resultado);
 
           alert(
-            `✅ ${categoria} "${material.titulo}" registrado correctamente`,
+            ` ${categoria} "${material.titulo}" registrado correctamente`,
           );
 
           // Limpiar formulario
@@ -1416,13 +1416,13 @@
             .forEach((form) => (form.style.display = "none"));
           document.getElementById("form-libro").style.display = "block";
         } catch (error) {
-          console.error("❌ Error completo:", error);
-          alert(`❌ ${error.message}`);
+          console.error(" Error completo:", error);
+          alert(` ${error.message}`);
         }
       }
 
       function abrirModalEditar(material) {
-        console.log("📝 Editando material:", material);
+        console.log(" Editando material:", material);
         document.getElementById("editar-id").value =
           material.id || material.id_libro;
         document.getElementById("editar-titulo").value = material.titulo || "";
@@ -1465,7 +1465,7 @@
           ),
           stock: parseInt(document.getElementById("editar-stock").value),
         };
-        console.log("📤 Actualizando material ID:", id, materialActualizado);
+        console.log(" Actualizando material ID:", id, materialActualizado);
         try {
           const res = await fetch(`${API_URL}/biblioteca/libros/${id}`, {
             method: "PUT",
@@ -1477,9 +1477,9 @@
             throw new Error(`Error ${res.status}: ${errorText}`);
           }
           const resultado = await res.json();
-          console.log("✅ Material actualizado:", resultado);
+          console.log(" Material actualizado:", resultado);
           alert(
-            `✅ Material "${materialActualizado.titulo}" actualizado correctamente`,
+            ` Material "${materialActualizado.titulo}" actualizado correctamente`,
           );
           cerrarModalEditar();
           const inputBusqueda = document.querySelector(
@@ -1494,20 +1494,20 @@
             buscarMaterial(tipo);
           }
         } catch (error) {
-          console.error("❌ Error al actualizar:", error);
-          alert(`❌ Error al actualizar el material:\n\n${error.message}`);
+          console.error(" Error al actualizar:", error);
+          alert(` Error al actualizar el material:\n\n${error.message}`);
         }
       }
 
       async function eliminarMaterial(id) {
         if (
           !confirm(
-            "⚠️ ¿Estás seguro de eliminar este material?\n\nEsta acción NO se puede deshacer.",
+            " ¿Estás seguro de eliminar este material?\n\nEsta acción NO se puede deshacer.",
           )
         ) {
           return;
         }
-        console.log("🗑️ Eliminando material ID:", id);
+        console.log(" Eliminando material ID:", id);
         try {
           const res = await fetch(`${API_URL}/biblioteca/libros/${id}`, {
             method: "DELETE",
@@ -1517,8 +1517,8 @@
             const errorText = await res.text();
             throw new Error(`Error ${res.status}: ${errorText}`);
           }
-          console.log("✅ Material eliminado correctamente");
-          alert("✅ Material eliminado correctamente");
+          console.log(" Material eliminado correctamente");
+          alert(" Material eliminado correctamente");
           const inputBusqueda = document.querySelector(
             "#buscar-libro, #buscar-tesis, #buscar-articulo",
           );
@@ -1531,15 +1531,15 @@
             buscarMaterial(tipo);
           }
         } catch (error) {
-          console.error("❌ Error al eliminar:", error);
-          alert(`❌ Error al eliminar el material:\n\n${error.message}`);
+          console.error(" Error al eliminar:", error);
+          alert(` Error al eliminar el material:\n\n${error.message}`);
         }
       }
 
       async function abrirModalPrestamo() {
         const uid = document.getElementById("rfid-prestamo").value.trim();
         if (!uid) {
-          alert("⚠️ Ingresa un UID válido");
+          alert(" Ingresa un UID válido");
           return;
         }
         try {
@@ -1552,7 +1552,7 @@
             (u) => u.tarjeta && u.tarjeta.tarjetaUid === uid,
           );
           if (!usuario) {
-            alert("❌ Usuario no encontrado con ese UID");
+            alert(" Usuario no encontrado con ese UID");
             return;
           }
           document.getElementById("prestamo-usuario-nombre").textContent =
@@ -1585,8 +1585,8 @@
           });
           document.getElementById("modal-prestamo").classList.add("active");
         } catch (error) {
-          console.error("❌ Error:", error);
-          alert(`❌ Error: ${error.message}`);
+          console.error(" Error:", error);
+          alert(` Error: ${error.message}`);
         }
       }
 
@@ -1600,26 +1600,26 @@
       async function procesarPrestamo(event) {
         event.preventDefault();
         if (!usuarioActualCache || !currentUID) {
-          alert("❌ Error: no hay usuario seleccionado");
+          alert(" Error: no hay usuario seleccionado");
           return;
         }
         const materialId = document.getElementById("prestamo-material").value;
         const dias = document.getElementById("prestamo-dias").value || 7;
         if (!materialId || materialId === "") {
-          alert("⚠️ Selecciona un material");
+          alert(" Selecciona un material");
           return;
         }
         console.log(
-          `📤 Registrando préstamo: UID=${currentUID}, LibroID=${materialId}, Días=${dias}`,
+          ` Registrando préstamo: UID=${currentUID}, LibroID=${materialId}, Días=${dias}`,
         );
         try {
           const url = `${API_URL}/biblioteca/prestamos?uid=${currentUID}&idLibro=${materialId}&dias=${dias}`;
-          console.log("🔗 URL:", url);
+          console.log(" URL:", url);
           const res = await fetch(url, {
             method: "POST",
             headers: getHeaders(),
           });
-          console.log("📥 Respuesta:", res.status, res.statusText);
+          console.log(" Respuesta:", res.status, res.statusText);
           if (!res.ok) {
             let errorMsg = "Error al registrar préstamo";
             const contentType = res.headers.get("content-type");
@@ -1633,13 +1633,13 @@
             throw new Error(errorMsg);
           }
           const prestamo = await res.json();
-          console.log("✅ Préstamo registrado:", prestamo);
-          alert(`✅ Préstamo registrado correctamente`);
+          console.log(" Préstamo registrado:", prestamo);
+          alert(` Préstamo registrado correctamente`);
           cerrarModalPrestamo();
           cargarPrestamos();
         } catch (error) {
-          console.error("❌ Error:", error);
-          alert(`❌ ${error.message}`);
+          console.error(" Error:", error);
+          alert(` ${error.message}`);
         }
       }
 
@@ -1671,7 +1671,7 @@
             })
             .join("");
         } catch (error) {
-          console.error("❌ Error:", error);
+          console.error(" Error:", error);
         }
       }
 
@@ -1704,7 +1704,7 @@
       async function abrirModalDevolucion() {
         const uid = document.getElementById("rfid-devolucion").value.trim();
         if (!uid) {
-          alert("⚠️ Ingresa un UID válido");
+          alert(" Ingresa un UID válido");
           return;
         }
         try {
@@ -1717,7 +1717,7 @@
             (u) => u.tarjeta && u.tarjeta.tarjetaUid === uid,
           );
           if (!usuario) {
-            alert("❌ Usuario no encontrado con ese UID");
+            alert(" Usuario no encontrado con ese UID");
             return;
           }
           const resPrestamos = await fetch(`${API_URL}/biblioteca/prestamos`, {
@@ -1729,7 +1729,7 @@
             (p) => p.usuario.id === usuario.id && p.estado === "PRESTADO",
           );
           if (prestamosUsuario.length === 0) {
-            alert("ℹ️ Este usuario no tiene préstamos activos");
+            alert(" Este usuario no tiene préstamos activos");
             return;
           }
           document.getElementById("devolucion-usuario-nombre").textContent =
@@ -1750,8 +1750,8 @@
             .join("");
           document.getElementById("modal-devolucion").classList.add("active");
         } catch (error) {
-          console.error("❌ Error:", error);
-          alert("❌ Error al buscar préstamos del usuario");
+          console.error(" Error:", error);
+          alert(" Error al buscar préstamos del usuario");
         }
       }
 
@@ -1773,7 +1773,7 @@
           }
           const resultado = await res.json();
           alert(
-            `✅ ${resultado.mensaje || "Devolución registrada correctamente"}`,
+            ` ${resultado.mensaje || "Devolución registrada correctamente"}`,
           );
           cerrarModalDevolucion();
           cargarDevoluciones();
@@ -1815,7 +1815,7 @@
       }
 
       window.addEventListener("DOMContentLoaded", () => {
-        console.log("✅ Sistema Biblioteca RFID - Inicializado");
+        console.log(" Sistema Biblioteca RFID - Inicializado");
         setTimeout(() => {
           cargarDashboard();
         }, 500);

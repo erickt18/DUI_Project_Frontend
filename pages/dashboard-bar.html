@@ -1377,7 +1377,7 @@
 
       // ========== CARGAR DASHBOARD (CORREGIDO) ==========
       async function cargarDashboard() {
-        console.log("📊 Cargando dashboard...");
+        console.log(" Cargando dashboard...");
 
         // Valores por defecto
         document.getElementById("stat-productos").innerText = "3";
@@ -1413,17 +1413,17 @@
 
           if (resActividad.ok) {
             const todasTransacciones = await resActividad.json();
-            console.log("✅ Transacciones recibidas:", todasTransacciones);
+            console.log(" Transacciones recibidas:", todasTransacciones);
 
             // Mostrar las últimas 5 transacciones
             const recientes = todasTransacciones.slice(0, 5);
             mostrarActividadDashboard(recientes);
           } else {
-            console.log("⚠️ No se pudieron cargar transacciones");
+            console.log(" No se pudieron cargar transacciones");
             mostrarActividadDemo();
           }
         } catch (error) {
-          console.log("⚠️ Error:", error);
+          console.log(" Error:", error);
           mostrarActividadDemo();
         }
       }
@@ -1630,7 +1630,7 @@
           });
 
           if (res.ok) {
-            alert(id ? "✅ Producto actualizado" : "✅ Producto creado");
+            alert(id ? " Producto actualizado" : " Producto creado");
             cerrarModalProducto();
             cargarProductos();
           } else {
@@ -1666,7 +1666,7 @@
         );
 
         if (!uid || monto <= 0) {
-          alert("⚠️ Completa todos los campos");
+          alert(" Completa todos los campos");
           return;
         }
 
@@ -1682,7 +1682,7 @@
           if (res.ok) {
             const data = await res.json();
             alert(
-              `✅ Recarga exitosa\n\nNuevo saldo: $${data.nuevoSaldo.toFixed(2)}`,
+              ` Recarga exitosa\n\nNuevo saldo: $${data.nuevoSaldo.toFixed(2)}`,
             );
             document.getElementById("info-recarga").style.display = "block";
             document.getElementById("recarga-usuario").textContent =
@@ -1693,10 +1693,10 @@
             cargarRecargasHoy();
           } else {
             const error = await res.json();
-            alert("❌ Error: " + (error.error || "No se pudo procesar"));
+            alert(" Error: " + (error.error || "No se pudo procesar"));
           }
         } catch (error) {
-          alert("❌ Error de conexión");
+          alert(" Error de conexión");
         }
       }
 
@@ -1727,7 +1727,7 @@
             <tr>
               <td>${new Date(t.fecha).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}</td>
               <td>${t.usuario?.nombreCompleto || t.usuario?.email || "Usuario"}</td>
-              <!-- ❌ SIN COLUMNA UID -->
+              <!--  SIN COLUMNA UID -->
               <td style="font-weight: bold; color: #27ae60">$${Math.abs(t.monto).toFixed(2)}</td>
             </tr>
           `;
@@ -1736,7 +1736,7 @@
             }
           }
         } catch (error) {
-          console.error("❌ Error cargando recargas:", error);
+          console.error(" Error cargando recargas:", error);
         }
       }
 
@@ -1841,7 +1841,7 @@
         document.getElementById("cobro-saldo").textContent = "$--";
 
         try {
-          // ✅ PETICIÓN AL BACKEND PARA OBTENER SALDO REAL
+          //  PETICIÓN AL BACKEND PARA OBTENER SALDO REAL
           const res = await fetch(
             `${API_URL}/tarjetas/verificar?uid=${encodeURIComponent(uid)}`,
             {
@@ -1855,7 +1855,7 @@
           if (res.ok) {
             const data = await res.json();
 
-            // ✅ USAR SALDO REAL DEL BACKEND
+            //  USAR SALDO REAL DEL BACKEND
             saldoActual = data.saldo || 0;
 
             document.getElementById("cobro-usuario").textContent =
@@ -1868,12 +1868,12 @@
           } else {
             const error = await res.json();
             document.getElementById("info-cobro").style.display = "none";
-            alert("❌ " + (error.error || "Tarjeta no válida"));
+            alert(" " + (error.error || "Tarjeta no válida"));
           }
         } catch (error) {
-          console.error("❌ Error:", error);
+          console.error(" Error:", error);
           document.getElementById("info-cobro").style.display = "none";
-          alert("❌ Error al verificar la tarjeta");
+          alert(" Error al verificar la tarjeta");
         }
       }
 
@@ -1947,12 +1947,12 @@
         const uid = document.getElementById("cobro-uid").value.trim();
 
         if (!uid) {
-          alert("⚠️ Escanea una tarjeta RFID");
+          alert(" Escanea una tarjeta RFID");
           return;
         }
 
         if (carritoCompra.length === 0) {
-          alert("⚠️ El carrito está vacío");
+          alert(" El carrito está vacío");
           return;
         }
 
@@ -1976,7 +1976,7 @@
           if (res.ok) {
             const data = await res.json();
             alert(
-              `✅ Cobro exitoso\n\nTotal: $${data.totalCobrado.toFixed(2)}\nNuevo saldo: $${data.nuevoSaldo.toFixed(2)}`,
+              ` Cobro exitoso\n\nTotal: $${data.totalCobrado.toFixed(2)}\nNuevo saldo: $${data.nuevoSaldo.toFixed(2)}`,
             );
 
             carritoCompra = [];
@@ -1988,10 +1988,10 @@
             cargarVentasHoy();
           } else {
             const error = await res.json();
-            alert("❌ Error: " + (error.error || "No se pudo procesar"));
+            alert(" Error: " + (error.error || "No se pudo procesar"));
           }
         } catch (error) {
-          alert("❌ Error de conexión");
+          alert(" Error de conexión");
         }
       }
 
@@ -2050,7 +2050,7 @@
           if (res.ok) {
             todasLasTransacciones = await res.json();
             console.log(
-              "📋 Transacciones cargadas:",
+              " Transacciones cargadas:",
               todasLasTransacciones.length,
             );
 
@@ -2279,7 +2279,7 @@
           document.getElementById("selector-anio-reporte").value,
         );
 
-        console.log(`📊 Cargando reportes para ${mes + 1}/${anio}`);
+        console.log(` Cargando reportes para ${mes + 1}/${anio}`);
 
         try {
           const res = await fetch(`${API_URL}/transacciones`, {
@@ -2296,7 +2296,7 @@
             });
 
             console.log(
-              `✅ ${transaccionesMes.length} transacciones encontradas`,
+              ` ${transaccionesMes.length} transacciones encontradas`,
             );
 
             procesarReportes(transaccionesMes, mes, anio);

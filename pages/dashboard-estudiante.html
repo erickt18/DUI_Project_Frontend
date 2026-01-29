@@ -892,7 +892,7 @@
     </div>
 
     <script>
-      console.log("🚀 Sistema RFID Campus - Estudiante");
+      console.log(" Sistema RFID Campus - Estudiante");
       const API_URL = "http://localhost:8080/api";
       const token = localStorage.getItem("jwt_token");
       if (!token) {
@@ -919,7 +919,7 @@
       }
 
       function cambiarVista(vistaNombre, elementoMenu) {
-        console.log("🔄 Cambiando a vista:", vistaNombre);
+        console.log(" Cambiando a vista:", vistaNombre);
         document.querySelectorAll(".view-section").forEach((el) => {
           el.classList.remove("active");
           el.style.display = "none";
@@ -963,14 +963,14 @@
             document.getElementById("stat-nombre").textContent =
               usuarioActual.nombreCompleto || "Usuario";
           }
-          console.log("✅ Usuario cargado:", usuarioActual);
+          console.log(" Usuario cargado:", usuarioActual);
         } catch (error) {
-          console.error("❌ Error al cargar usuario:", error);
+          console.error(" Error al cargar usuario:", error);
         }
       }
 
       async function cargarDashboard() {
-        console.log("📊 Cargando dashboard...");
+        console.log(" Cargando dashboard...");
         await cargarUsuario();
 
         try {
@@ -1018,7 +1018,7 @@
           console.error("❌ Error:", error);
         }
 
-        console.log("✅ Dashboard cargado");
+        console.log(" Dashboard cargado");
       }
 
       async function cargarTransacciones() {
@@ -1063,7 +1063,7 @@
         const tbody = document.getElementById("tabla-lineal");
 
         if (!query) {
-          alert("⚠️ Ingresa una palabra clave");
+          alert(" Ingresa una palabra clave");
           return;
         }
 
@@ -1099,10 +1099,10 @@
             )
             .join("");
 
-          resultDiv.textContent = `✅ ${resultado.length} resultado(s) encontrado(s) con búsqueda LINEAL`;
+          resultDiv.textContent = ` ${resultado.length} resultado(s) encontrado(s) con búsqueda LINEAL`;
         } catch (error) {
-          console.error("❌ Error:", error);
-          resultDiv.textContent = "❌ Error en la búsqueda";
+          console.error(" Error:", error);
+          resultDiv.textContent = " Error en la búsqueda";
         }
       }
 
@@ -1114,13 +1114,13 @@
         const tbody = document.getElementById("tabla-binaria");
 
         if (isNaN(monto) || monto <= 0) {
-          alert("⚠️ Ingresa un monto válido");
+          alert(" Ingresa un monto válido");
           return;
         }
 
         try {
           resultDiv.style.display = "block";
-          resultDiv.textContent = "🎯 Buscando con algoritmo BINARIO...";
+          resultDiv.textContent = " Buscando con algoritmo BINARIO...";
 
           const res = await fetch(
             `${API_URL}/estudiante/buscar-monto?monto=${monto}`,
@@ -1147,10 +1147,10 @@
       </tr>
     `;
 
-          resultDiv.textContent = `✅ Transacción encontrada con búsqueda BINARIA`;
+          resultDiv.textContent = ` Transacción encontrada con búsqueda BINARIA`;
         } catch (error) {
-          console.error("❌ Error:", error);
-          resultDiv.textContent = "❌ Error en la búsqueda";
+          console.error(" Error:", error);
+          resultDiv.textContent = " Error en la búsqueda";
         }
       }
 
@@ -1191,7 +1191,7 @@
             })
             .join("");
         } catch (error) {
-          console.error("❌ Error:", error);
+          console.error(" Error:", error);
         }
       }
 
@@ -1228,14 +1228,14 @@
             )
             .join("");
         } catch (error) {
-          console.error("❌ Error:", error);
+          console.error(" Error:", error);
         }
       }
 
       async function bloquearTarjeta() {
         if (
           !confirm(
-            "⚠️ ¿Estás ABSOLUTAMENTE SEGURO?\n\nEsta acción bloqueará tu tarjeta PERMANENTEMENTE.\n\n¡NO podrás usar NINGÚN servicio del campus!",
+            " ¿Estás ABSOLUTAMENTE SEGURO?\n\nEsta acción bloqueará tu tarjeta PERMANENTEMENTE.\n\n¡NO podrás usar NINGÚN servicio del campus!",
           )
         ) {
           return;
@@ -1246,7 +1246,7 @@
           msgDiv.style.display = "block";
           msgDiv.style.background = "#FFF3E0";
           msgDiv.style.color = "#E65100";
-          msgDiv.textContent = "🔄 Bloqueando tarjeta...";
+          msgDiv.textContent = " Bloqueando tarjeta...";
 
           const res = await fetch(`${API_URL}/tarjetas/bloquear-mi-tarjeta`, {
             method: "POST",
@@ -1262,7 +1262,7 @@
 
           msgDiv.style.background = "#C8E6C9";
           msgDiv.style.color = "#2E7D32";
-          msgDiv.textContent = `✅ ${resultado.message}`;
+          msgDiv.textContent = ` ${resultado.message}`;
 
           setTimeout(() => {
             alert(
@@ -1272,25 +1272,25 @@
             window.location.href = "../index.html";
           }, 2000);
         } catch (error) {
-          console.error("❌ Error:", error);
+          console.error(" Error:", error);
           const msgDiv = document.getElementById("bloqueo-msg");
           msgDiv.style.display = "block";
           msgDiv.style.background = "#FFCDD2";
           msgDiv.style.color = "#C62828";
-          msgDiv.textContent = `❌ ${error.message}`;
+          msgDiv.textContent = ` ${error.message}`;
         }
       }
 
       // ========== MODAL PERFIL ==========
       async function abrirModalPerfil() {
-        console.log("📋 Abriendo modal de perfil...");
+        console.log(" Abriendo modal de perfil...");
 
         if (!usuarioActual) {
           await cargarUsuario();
         }
 
         if (!usuarioActual) {
-          alert("❌ Error: No se pudo cargar la información del usuario");
+          alert(" Error: No se pudo cargar la información del usuario");
           return;
         }
 
@@ -1322,14 +1322,14 @@
               tarjeta.codigoRfid || "—";
 
             const estadoBadge = tarjeta.bloqueada
-              ? '<span style="color:#E53935;font-weight:700;">🔒 BLOQUEADA</span>'
-              : '<span style="color:#43A047;font-weight:700;">✅ ACTIVA</span>';
+              ? '<span style="color:#E53935;font-weight:700;"> BLOQUEADA</span>'
+              : '<span style="color:#43A047;font-weight:700;"> ACTIVA</span>';
             document.getElementById("perfil-estado").innerHTML = estadoBadge;
 
             
           }
         } catch (error) {
-          console.error("❌ Error al cargar tarjeta:", error);
+          console.error(" Error al cargar tarjeta:", error);
           document.getElementById("perfil-rfid").textContent =
             "Error al cargar";
           document.getElementById("perfil-estado").textContent = "—";
@@ -1348,7 +1348,7 @@
               trans.length;
           }
         } catch (error) {
-          console.error("❌ Error al cargar transacciones:", error);
+          console.error(" Error al cargar transacciones:", error);
         }
 
         try {
@@ -1362,17 +1362,17 @@
               prest.length;
           }
         } catch (error) {
-          console.error("❌ Error al cargar préstamos:", error);
+          console.error(" Error al cargar préstamos:", error);
         }
 
         // Mostrar modal
         document.getElementById("modal-perfil").classList.add("active");
-        console.log("✅ Modal de perfil abierto");
+        console.log(" Modal de perfil abierto");
       }
 
       function cerrarModalPerfil() {
         document.getElementById("modal-perfil").classList.remove("active");
-        console.log("✅ Modal de perfil cerrado");
+        console.log(" Modal de perfil cerrado");
       }
 
       // Cerrar con ESC
@@ -1383,7 +1383,7 @@
       });
 
       window.addEventListener("DOMContentLoaded", async () => {
-        console.log("✅ Sistema iniciado");
+        console.log(" Sistema iniciado");
         await cargarDashboard();
       });
     </script>

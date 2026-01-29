@@ -653,20 +653,20 @@
     <script src="js/utils/auth.js"></script>
 
     <script>
-        console.log("🚀 Sistema RFID Campus - Administrador");
+        console.log(" Sistema RFID Campus - Administrador");
         
         protegerRuta();
         const token = obtenerToken();
         const rolUsuario = obtenerRolUsuario();
 
         if (rolUsuario !== 'ROLE_ADMIN') {
-            alert("⚠️ No tienes permisos de Administrador");
+            alert(" No tienes permisos de Administrador");
             redirigirSegunRol();
         }
 
         // ========== NAVEGACIÓN ==========
         function cambiarVista(vistaNombre, elementoMenu) {
-            console.log("🔄 Cambiando a vista:", vistaNombre);
+            console.log(" Cambiando a vista:", vistaNombre);
             
             document.querySelectorAll('.view-section').forEach(el => {
                 el.classList.remove('active');
@@ -689,7 +689,7 @@
 
         // ========== CARGAR REPORTES ==========
         async function cargarReportesReales() {
-            console.log("📊 Cargando reportes...");
+            console.log(" Cargando reportes...");
             try {
                 const res = await fetch("http://localhost:8080/api/usuarios/dashboard/stats", {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -708,18 +708,18 @@
                     }).format(stats.dineroTotal);
                     document.getElementById('stat-dinero').innerText = dineroFormateado;
 
-                    console.log("✅ Reportes cargados:", stats);
+                    console.log(" Reportes cargados:", stats);
                 } else {
-                    console.error("❌ Error al cargar reportes");
+                    console.error(" Error al cargar reportes");
                 }
             } catch (error) {
-                console.error("❌ Error cargando estadísticas:", error);
+                console.error(" Error cargando estadísticas:", error);
             }
         }
 
         // ========== CARGAR USUARIOS ==========
         async function cargarUsuarios() {
-            console.log("👥 Cargando usuarios...");
+            console.log(" Cargando usuarios...");
             try {
                 const res = await fetch("http://localhost:8080/api/usuarios", {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -765,16 +765,16 @@
                         </tr>`;
                 });
 
-                console.log("✅ Usuarios cargados:", usuarios.length);
+                console.log(" Usuarios cargados:", usuarios.length);
             } catch (error) {
-                console.error("❌ Error al cargar usuarios:", error);
+                console.error(" Error al cargar usuarios:", error);
                 document.getElementById('tablaUsuarios').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#ff6b6b;">Error al cargar usuarios</td></tr>';
             }
         }
 
         // ========== MODAL EDITAR ==========
         function abrirModal(id, rolActual, rfidActual) {
-            console.log("✏️ Abriendo modal para usuario:", id);
+            console.log(" Abriendo modal para usuario:", id);
             document.getElementById('editId').value = id;
             document.getElementById('editRfid').value = rfidActual;
             document.getElementById('editRol').value = rolActual;
@@ -782,7 +782,7 @@
         }
 
         function cerrarModal() {
-            console.log("✅ Cerrando modal");
+            console.log(" Cerrando modal");
             document.getElementById('modalEditar').classList.remove('active');
         }
 
@@ -793,16 +793,16 @@
             const tarjetaUid = document.getElementById('editRfid').value.trim();
 
             if (!rol) {
-                alert("⚠️ Selecciona un rol.");
+                alert(" Selecciona un rol.");
                 return;
             }
 
-            if (!tarjetaUid && !confirm("⚠️ ¿Estás seguro de dejar a este usuario SIN tarjeta?")) {
+            if (!tarjetaUid && !confirm(" ¿Estás seguro de dejar a este usuario SIN tarjeta?")) {
                 return;
             }
 
             try {
-                console.log("💾 Guardando cambios para usuario:", id);
+                console.log(" Guardando cambios para usuario:", id);
                 const res = await fetch(`http://localhost:8080/api/usuarios/${id}/asignar-datos`, {
                     method: 'PUT',
                     headers: { 
@@ -815,17 +815,17 @@
                 const data = await res.json().catch(() => ({}));
                 
                 if (res.ok) {
-                    alert('✅ Usuario actualizado correctamente');
+                    alert(' Usuario actualizado correctamente');
                     cerrarModal();
                     cargarUsuarios();
-                    console.log("✅ Cambios guardados");
+                    console.log(" Cambios guardados");
                 } else {
-                    alert(`❌ Error: ${data.message || "Revisa la consola"}`);
-                    console.error("❌ Error al guardar:", data);
+                    alert(` Error: ${data.message || "Revisa la consola"}`);
+                    console.error(" Error al guardar:", data);
                 }
             } catch (error) {
-                alert('❌ Error de conexión con el servidor');
-                console.error("❌ Error:", error);
+                alert(' Error de conexión con el servidor');
+                console.error(" Error:", error);
             }
         }
 
