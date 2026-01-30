@@ -1830,52 +1830,45 @@
       }
 
       async function verificarTarjetaCobro() {
-        const uid = document.getElementById("cobro-uid").value.trim();
-        if (uid.length < 5) {
-          document.getElementById("info-cobro").style.display = "none";
-          return;
+    const input = document.getElementById('cobro-uid');
+    let uid = input.value.trim(); // ✅ Limpiar espacios
+
+    // ✅ LIMPIAR: Remover todo excepto números
+    uid = uid.replace(/[^0-9]/g, '');
+
+    if (uid.length < 5) {
+        document.getElementById('info-cobro').style.display = 'none';
+        return;
+    }
+
+    console.log("🔍 Verificando UID:", uid);
+
+    try {
+        const res = await fetch(`http://localhost:8080/api/tarjetas/verificar?uid=${uid}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+            document.getElementById('info-cobro').style.display = 'none';
+            return;
         }
 
-        document.getElementById("info-cobro").style.display = "block";
-        document.getElementById("cobro-usuario").textContent = "Verificando...";
-        document.getElementById("cobro-saldo").textContent = "$--";
+        const data = await res.json();
+        
+        // Mostrar información del usuario
+        document.getElementById('cobro-usuario').innerText = data.nombreCompleto;
+        document.getElementById('cobro-saldo').innerText = `$${data.saldo.toFixed(2)}`;
+        document.getElementById('info-cobro').style.display = 'block';
+        
+        saldoActualUsuario = parseFloat(data.saldo);
+        console.log("✅ Tarjeta verificada:", data);
 
-        try {
-          //  PETICIÓN AL BACKEND PARA OBTENER SALDO REAL
-          const res = await fetch(
-            `${API_URL}/tarjetas/verificar?uid=${encodeURIComponent(uid)}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            },
-          );
+    } catch (error) {
+        console.error("❌ Error al verificar tarjeta:", error);
+        document.getElementById('info-cobro').style.display = 'none';
+    }
+}
 
-          if (res.ok) {
-            const data = await res.json();
-
-            //  USAR SALDO REAL DEL BACKEND
-            saldoActual = data.saldo || 0;
-
-            document.getElementById("cobro-usuario").textContent =
-              data.nombreCompleto || data.usuario || "Estudiante Verificado";
-
-            document.getElementById("cobro-saldo").textContent =
-              "$" + saldoActual.toFixed(2);
-
-            actualizarResumen();
-          } else {
-            const error = await res.json();
-            document.getElementById("info-cobro").style.display = "none";
-            alert(" " + (error.error || "Tarjeta no válida"));
-          }
-        } catch (error) {
-          console.error(" Error:", error);
-          document.getElementById("info-cobro").style.display = "none";
-          alert(" Error al verificar la tarjeta");
-        }
-      }
 
       function agregarProductoCarrito(idProducto) {
         const producto = productosVenta.find((p) => p.id === idProducto);

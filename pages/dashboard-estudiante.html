@@ -826,10 +826,46 @@
                 <span class="info-label">Correo Electrónico</span>
                 <span class="info-value" id="perfil-correo">—</span>
               </div>
-              <div class="info-item">
+              <div class="info-item" style="grid-column: 1 / -1">
                 <span class="info-label">Carrera</span>
-                <span class="info-value" id="perfil-carrera">—</span>
+                <div style="display: flex; gap: 10px; margin-top: 8px">
+                  <input
+                    type="text"
+                    id="input-carrera"
+                    class="form-input"
+                    placeholder="Ej: Ingeniería de Software"
+                    disabled
+                    style="
+                      flex: 1;
+                      padding: 10px;
+                      border: 2px solid #e0e0e0;
+                      border-radius: 8px;
+                      font-size: 14px;
+                    "
+                  />
+                  <button
+                    id="btn-editar-carrera"
+                    class="btn-primary"
+                    onclick="habilitarEdicionCarrera()"
+                    style="padding: 10px 20px; white-space: nowrap"
+                  >
+                    <i class="fas fa-edit"></i> Editar
+                  </button>
+                  <button
+                    id="btn-guardar-carrera"
+                    class="btn-primary"
+                    onclick="guardarCarrera()"
+                    style="
+                      padding: 10px 20px;
+                      display: none;
+                      background: #43a047;
+                    "
+                  >
+                    <i class="fas fa-save"></i> Guardar
+                  </button>
+                </div>
               </div>
+
               <div class="info-item">
                 <span class="info-label">ID Usuario</span>
                 <span class="info-value" id="perfil-id">—</span>
@@ -1303,8 +1339,9 @@
           usuarioActual.nombreCompleto || "—";
         document.getElementById("perfil-correo").textContent =
           usuarioActual.email || "—";
-        document.getElementById("perfil-carrera").textContent =
-          usuarioActual.carrera || "No especificada";
+        document.getElementById("input-carrera").value =
+          usuarioActual.carrera || "";
+
         document.getElementById("perfil-id").textContent =
           `#${usuarioActual.id}`;
         document.getElementById("perfil-saldo").textContent =
@@ -1325,15 +1362,12 @@
               ? '<span style="color:#E53935;font-weight:700;"> BLOQUEADA</span>'
               : '<span style="color:#43A047;font-weight:700;"> ACTIVA</span>';
             document.getElementById("perfil-estado").innerHTML = estadoBadge;
-
-            
           }
         } catch (error) {
           console.error(" Error al cargar tarjeta:", error);
           document.getElementById("perfil-rfid").textContent =
             "Error al cargar";
           document.getElementById("perfil-estado").textContent = "—";
-          
         }
 
         // Estadísticas
@@ -1386,6 +1420,60 @@
         console.log(" Sistema iniciado");
         await cargarDashboard();
       });
+      // ========== EDITAR CARRERA ==========
+function habilitarEdicionCarrera() {
+    document.getElementById('input-carrera').disabled = false;
+    document.getElementById('btn-editar-carrera').style.display = 'none';
+    document.getElementById('btn-guardar-carrera').style.display = 'inline-block';
+    document.getElementById('input-carrera').focus();
+    console.log('✏️ Edición de carrera habilitada');
+}
+
+// ========== GUARDAR CARRERA ==========
+async function guardarCarrera() {
+    const carrera = document.getElementById('input-carrera').value.trim();
+    
+    if (!carrera) {
+        alert('⚠️ La carrera no puede estar vacía');
+        return;
+    }
+    
+    try {
+        console.log('💾 Guardando carrera:', carrera);
+        
+        const res = await fetch(`${API_URL}/usuarios/mi-perfil/actualizar-carrera`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify({ "carrera": carrera })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            alert('✅ Carrera actualizada correctamente');
+            
+            // Actualizar el cache local
+            if (usuarioActual) {
+                usuarioActual.carrera = carrera;
+            }
+            
+            // Deshabilitar edición
+            document.getElementById('input-carrera').disabled = true;
+            document.getElementById('btn-editar-carrera').style.display = 'inline-block';
+            document.getElementById('btn-guardar-carrera').style.display = 'none';
+            
+            console.log('✅ Carrera guardada:', carrera);
+        } else {
+            alert('❌ Error: ' + (data.error || 'No se pudo actualizar'));
+            console.error('❌ Error al guardar carrera:', data);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al guardar carrera:', error);
+        alert('❌ Error de conexión con el servidor');
+    }
+}
+
     </script>
   </body>
 </html>
