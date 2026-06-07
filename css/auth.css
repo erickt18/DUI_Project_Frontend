@@ -1,65 +1,201 @@
 :root {
-    --bg-dark: #211C29;
-    --bg-light: #796696;
-    --primary: #9b7ec4;
-    --text-white: #ffffff;
-    --glass: rgba(255, 255, 255, 0.95);
-    --glass-border: rgba(255, 255, 255, 0.2);
+    /* Paleta Corporativa Equilibrada */
+    --ucacue-red-dark: #b71c1c;    /* Rojo Profundo para el panel izquierdo */
+    --ucacue-red-light: #d32f2f;   /* Rojo Vivo para el botón principal y hovers */
+    --ucacue-gold: #ecd06f;        /* Dorado para la línea de acento */
+    --text-dark: #1e293b;          /* Gris oscuro azulado para títulos legibles */
+    --text-muted: #64748b;         /* Gris medio para subtítulos */
+    --border-color: #cbd5e1;       /* Gris suave para bordes de inputs */
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+}
 
 body {
-    background-color: var(--bg-light);
-    color: #333;
+    background-color: #f8fafc;
+    color: var(--text-dark);
     min-height: 100vh;
     display: flex;
 }
 
-/* === ESTILOS LOGIN Y REGISTER === */
-.auth-container { display: flex; width: 100%; height: 100vh; background: var(--bg-dark); }
+/* === CONTENEDOR PRINCIPAL === */
+.auth-container { 
+    display: flex; 
+    width: 100%; 
+    height: 100vh; 
+    background: #ffffff; 
+}
 
+/* === PANEL IZQUIERDO (IMPECABLE) === */
 .auth-left {
-    flex: 1; background: linear-gradient(135deg, #211C29 0%, #4a3b5e 100%);
-    display: flex; flex-direction: column; justify-content: center; padding: 60px;
-    color: white; position: relative; overflow: hidden;
+    flex: 1; 
+    background: linear-gradient(135deg, var(--ucacue-red-dark) 0%, #660000 100%);
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    padding: 60px;
+    color: #ffffff; 
+    position: relative; 
+    overflow: hidden;
 }
 
 .auth-left::before {
-    content: ''; position: absolute; width: 200%; height: 200%;
-    background: url('https://img.freepik.com/free-vector/gradient-network-connection-background_23-2148879890.jpg');
-    opacity: 0.1; animation: moveBackground 20s linear infinite;
+    content: ''; 
+    position: absolute; 
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('../assets/img/aguila.png') no-repeat center center;
+    background-size: contain; 
+    opacity: 0.18; 
+    z-index: 1;
 }
 
+.auth-left * {
+    position: relative;
+    z-index: 2;
+}
+
+.auth-left h1::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background-color: var(--ucacue-gold);
+    margin-top: 15px;
+    border-radius: 2px;
+}
+
+/* === PANEL DERECHO: CORRECCIÓN DE COLORES Y TEXTOS === */
 .auth-right {
-    width: 500px; background: var(--glass); padding: 60px;
-    display: flex; flex-direction: column; justify-content: center;
-    box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+    width: 500px; 
+    background: #ffffff; 
+    padding: 60px;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
 }
 
-.auth-title { font-size: 2.5rem; margin-bottom: 10px; color: var(--bg-dark); }
-.auth-subtitle { color: #666; margin-bottom: 30px; }
+.auth-title { 
+    font-size: 2.4rem; 
+    font-weight: 700;
+    margin-bottom: 8px; 
+    color: var(--ucacue-red-dark); /* Título en Rojo Institucional */
+}
 
-.input-group { margin-bottom: 20px; position: relative; }
-.input-group label { display: block; margin-bottom: 8px; color: #555; font-size: 0.9rem; }
+.auth-subtitle { 
+    color: var(--text-muted); 
+    margin-bottom: 35px; 
+    font-size: 0.95rem;
+}
+
+/* === COMPONENTES DEL FORMULARIO === */
+.input-group { 
+    margin-bottom: 22px; 
+    position: relative; 
+}
+
+.input-group label { 
+    display: block; 
+    margin-bottom: 8px; 
+    color: var(--text-dark); 
+    font-size: 0.9rem; 
+    font-weight: 600;
+}
+
 .auth-input {
-    width: 100%; padding: 12px 15px; border: 2px solid #e1e1e1;
-    border-radius: 8px; background: #f9f9f9; transition: 0.3s;
+    width: 100%; 
+    padding: 13px 16px; 
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px; 
+    background: #ffffff; /* Fondo blanco limpio para los campos */
+    color: var(--text-dark);
+    font-size: 1rem;
+    transition: all 0.25s ease;
 }
-.auth-input:focus { border-color: var(--primary); background: #fff; outline: none; }
 
+.auth-input:focus { 
+    border-color: var(--ucacue-red-light); 
+    outline: none; 
+    box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.1); /* Brillo sutil rojo en foco */
+}
+
+/* === BOTÓN PRINCIPAL (ROJO UCACUE CON ALTO CONTRASTE) === */
 .btn-auth {
-    width: 100%; padding: 14px;
-    background: linear-gradient(to right, #796696, #211C29);
-    color: white; border: none; border-radius: 8px;
-    font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s;
+    width: 100%; 
+    padding: 15px;
+    background: var(--ucacue-red-light); /* Botón Rojo de alta visibilidad */
+    color: #ffffff; /* Texto blanco puro */
+    border: none; 
+    border-radius: 8px;
+    font-size: 1rem; 
+    font-weight: 700; 
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    margin-top: 10px;
 }
-.btn-auth:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(121, 102, 150, 0.4); }
 
-.auth-link { text-align: center; margin-top: 20px; font-size: 0.9rem; }
-.auth-link a { color: var(--primary); text-decoration: none; font-weight: bold; }
+.btn-auth:hover { 
+    background: var(--ucacue-red-dark); /* Se oscurece elegantemente al pasar el cursor */
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2); 
+}
 
-@media (max-width: 768px) {
+.btn-auth:active {
+    transform: translateY(0);
+}
+
+/* === OPCIONES DE SESIÓN Y ENLACES === */
+.auth-right label input[type="checkbox"] {
+    accent-color: var(--ucacue-red-light); /* Checkbox en sintonía con el rojo */
+    cursor: pointer;
+}
+
+.auth-right label {
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.auth-link { 
+    text-align: center; 
+    margin-top: 30px; 
+    font-size: 0.95rem; 
+    color: var(--text-muted);
+}
+
+.auth-link a { 
+    color: var(--ucacue-red-light); 
+    text-decoration: none; 
+    font-weight: 700; 
+    transition: color 0.2s ease;
+}
+
+.auth-link a:hover {
+    color: var(--ucacue-red-dark); 
+    text-decoration: underline;
+}
+
+/* Enlace "¿Olvidaste tu contraseña?" */
+.auth-right a[href="forgot-password.html"] {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.auth-right a[href="forgot-password.html"]:hover {
+    color: var(--ucacue-red-light);
+    text-decoration: underline;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 850px) {
     .auth-left { display: none; }
-    .auth-right { width: 100%; }
+    .auth-right { width: 100%; padding: 40px 20px; }
 }
