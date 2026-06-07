@@ -15,7 +15,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
+    ></script>
     <link rel="stylesheet" href="../css/bar.css" />
   </head>
 
@@ -36,7 +39,10 @@
           <p>CatoID · UCACUE</p>
         </div>
 
-        <button class="menu-item active" onclick="cambiarVista('dashboard', this)">
+        <button
+          class="menu-item active"
+          onclick="cambiarVista('dashboard', this)"
+        >
           <i class="fas fa-chart-line"></i>
           <span>Dashboard</span>
         </button>
@@ -46,19 +52,28 @@
           <span>Productos</span>
         </button>
 
-        <button class="menu-item" onclick="toggleSubmenu('finanzas-submenu', this)">
+        <button
+          class="menu-item"
+          onclick="toggleSubmenu('finanzas-submenu', this)"
+        >
           <i class="fas fa-wallet"></i>
           <span>Finanzas</span>
           <i class="fas fa-chevron-down submenu-arrow"></i>
         </button>
 
         <div id="finanzas-submenu" class="submenu">
-          <button class="submenu-item" onclick="cambiarVista('recargar-saldo', this)">
+          <button
+            class="submenu-item"
+            onclick="cambiarVista('recargar-saldo', this)"
+          >
             <i class="fas fa-coins"></i>
             <span>Recargar saldo</span>
           </button>
 
-          <button class="submenu-item" onclick="cambiarVista('cobrar-rfid', this)">
+          <button
+            class="submenu-item"
+            onclick="cambiarVista('cobrar-rfid', this)"
+          >
             <i class="fas fa-credit-card"></i>
             <span>Cobrar con RFID / NFC</span>
           </button>
@@ -145,7 +160,9 @@
                 </thead>
                 <tbody id="tabla-actividad">
                   <tr>
-                    <td colspan="4" class="table-empty">Cargando actividad...</td>
+                    <td colspan="4" class="table-empty">
+                      Cargando actividad...
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -198,7 +215,9 @@
                 </thead>
                 <tbody id="tabla-productos">
                   <tr>
-                    <td colspan="7" class="table-empty">Cargando productos...</td>
+                    <td colspan="7" class="table-empty">
+                      Cargando productos...
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -224,7 +243,9 @@
             <div class="glass-table-container">
               <div class="section-head">
                 <h3>Lectura de tarjeta / celular</h3>
-                <span class="section-note">El cursor se enfoca automáticamente aquí</span>
+                <span class="section-note"
+                  >El cursor se enfoca automáticamente aquí</span
+                >
               </div>
 
               <form id="form-recarga" onsubmit="procesarRecarga(event)">
@@ -239,8 +260,27 @@
                     oninput="verificarTarjetaRecarga()"
                   />
                 </div>
+                <!-- AVISO: usuario no encontrado -->
+                <div
+                  id="aviso-recarga"
+                  style="
+                    display: none;
+                    margin-top: 10px;
+                    padding: 12px 14px;
+                    background: #fef2f2;
+                    border-left: 4px solid #d32f2f;
+                    border-radius: 10px;
+                    color: #b71c1c;
+                    font-weight: 700;
+                    font-size: 0.9rem;
+                  "
+                ></div>
 
-                <div id="info-recarga" class="user-info-card" style="display: none;">
+                <div
+                  id="info-recarga"
+                  class="user-info-card"
+                  style="display: none"
+                >
                   <div class="user-info-grid">
                     <div>
                       <span class="mini-label">Usuario</span>
@@ -273,7 +313,10 @@
                   />
                 </div>
 
-                <button type="submit" class="btn-primary btn-success full-width">
+                <button
+                  type="submit"
+                  class="btn-primary btn-success full-width"
+                >
                   <i class="fas fa-check-circle"></i>
                   <span>Procesar recarga</span>
                 </button>
@@ -330,7 +373,10 @@
           <div class="header-dash">
             <div>
               <h1><i class="fas fa-shopping-cart"></i> Realizar compra</h1>
-              <p>Escanea la credencial o celular y cobra desde el saldo disponible.</p>
+              <p>
+                Escanea la credencial o celular y cobra desde el saldo
+                disponible.
+              </p>
             </div>
           </div>
 
@@ -351,8 +397,26 @@
                   oninput="verificarTarjetaCobro()"
                 />
               </div>
-
-              <div id="info-cobro" class="user-info-card success-card" style="display: none;">
+              <!-- AVISO: usuario no encontrado -->
+              <div
+                id="aviso-cobro"
+                style="
+                  display: none;
+                  margin-top: 10px;
+                  padding: 12px 14px;
+                  background: #fef2f2;
+                  border-left: 4px solid #d32f2f;
+                  border-radius: 10px;
+                  color: #b71c1c;
+                  font-weight: 700;
+                  font-size: 0.9rem;
+                "
+              ></div>
+              <div
+                id="info-cobro"
+                class="user-info-card success-card"
+                style="display: none"
+              >
                 <div class="user-info-grid">
                   <div>
                     <span class="mini-label">Usuario</span>
@@ -375,7 +439,9 @@
 
               <div class="section-head top-space">
                 <h3>Buscar producto</h3>
-                <span class="section-note">Solo se muestran activos y con stock</span>
+                <span class="section-note"
+                  >Solo se muestran activos y con stock</span
+                >
               </div>
 
               <div class="input-icon-wrap bottom-space">
@@ -417,7 +483,10 @@
                   <strong id="saldo-despues">$0.00</strong>
                 </div>
 
-                <button onclick="procesarCobro()" class="btn-primary btn-success full-width">
+                <button
+                  onclick="procesarCobro()"
+                  class="btn-primary btn-success full-width"
+                >
                   <i class="fas fa-check"></i>
                   <span>Confirmar compra</span>
                 </button>
@@ -540,7 +609,9 @@
                 </thead>
                 <tbody id="tabla-transacciones">
                   <tr>
-                    <td colspan="6" class="table-empty">Cargando transacciones...</td>
+                    <td colspan="6" class="table-empty">
+                      Cargando transacciones...
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -550,11 +621,20 @@
               <div id="info-paginacion">Mostrando 0 de 0 transacciones</div>
 
               <div class="pagination-controls">
-                <button onclick="cambiarPagina(-1)" id="btn-anterior" class="btn-action" disabled>
+                <button
+                  onclick="cambiarPagina(-1)"
+                  id="btn-anterior"
+                  class="btn-action"
+                  disabled
+                >
                   <i class="fas fa-chevron-left"></i>
                 </button>
                 <span id="numero-pagina" class="page-chip">1</span>
-                <button onclick="cambiarPagina(1)" id="btn-siguiente" class="btn-action">
+                <button
+                  onclick="cambiarPagina(1)"
+                  id="btn-siguiente"
+                  class="btn-action"
+                >
                   <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
@@ -677,7 +757,9 @@
       <div class="modal-box">
         <div class="modal-header">
           <h2 id="modal-titulo">Nuevo producto</h2>
-          <button class="modal-close" onclick="cerrarModalProducto()">&times;</button>
+          <button class="modal-close" onclick="cerrarModalProducto()">
+            &times;
+          </button>
         </div>
 
         <form id="form-producto" onsubmit="guardarProducto(event)">
@@ -696,7 +778,13 @@
           <div class="form-grid-2">
             <div class="form-group">
               <label for="producto-precio">Precio</label>
-              <input type="number" id="producto-precio" step="0.01" min="0" required />
+              <input
+                type="number"
+                id="producto-precio"
+                step="0.01"
+                min="0"
+                required
+              />
             </div>
 
             <div class="form-group">
@@ -711,7 +799,11 @@
           </label>
 
           <div class="modal-actions">
-            <button type="button" class="btn-secondary" onclick="cerrarModalProducto()">
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick="cerrarModalProducto()"
+            >
               Cancelar
             </button>
             <button type="submit" class="btn-primary">
@@ -788,11 +880,15 @@
       }
 
       function cambiarVista(vistaNombre, elementoMenu) {
-        document.querySelectorAll(".view-section").forEach((el) => el.classList.remove("active"));
+        document
+          .querySelectorAll(".view-section")
+          .forEach((el) => el.classList.remove("active"));
         const vista = document.getElementById("view-" + vistaNombre);
         if (vista) vista.classList.add("active");
 
-        document.querySelectorAll(".menu-item, .submenu-item").forEach((el) => el.classList.remove("active"));
+        document
+          .querySelectorAll(".menu-item, .submenu-item")
+          .forEach((el) => el.classList.remove("active"));
         if (elementoMenu) elementoMenu.classList.add("active");
 
         if (vistaNombre === "dashboard") cargarDashboard();
@@ -809,8 +905,10 @@
         if (vistaNombre === "transacciones") cargarTransacciones();
         if (vistaNombre === "reportes") {
           const hoy = new Date();
-          document.getElementById("selector-mes-reporte").value = hoy.getMonth();
-          document.getElementById("selector-anio-reporte").value = hoy.getFullYear();
+          document.getElementById("selector-mes-reporte").value =
+            hoy.getMonth();
+          document.getElementById("selector-anio-reporte").value =
+            hoy.getFullYear();
           cargarReportes();
         }
 
@@ -829,11 +927,14 @@
         if (limpio.length < 5) return null;
 
         try {
-          const res = await fetch(`${API_URL}/tarjetas/verificar?uid=${encodeURIComponent(limpio)}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
+          const res = await fetch(
+            `${API_URL}/tarjetas/verificar?uid=${encodeURIComponent(limpio)}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             },
-          });
+          );
 
           if (!res.ok) return null;
 
@@ -879,16 +980,33 @@
 
         if (!data) {
           limpiarPanelRecarga();
+
+          // Aviso solo si ya escribieron suficientes caracteres
+          if (uid.length >= 5) {
+            document.getElementById("aviso-recarga").textContent =
+              "Tarjeta no registrada o usuario inexistente.";
+            document.getElementById("aviso-recarga").style.display = "block";
+          } else {
+            document.getElementById("aviso-recarga").style.display = "none";
+          }
+
           return;
         }
+
+        // Si encontró usuario, oculta el aviso
+        document.getElementById("aviso-recarga").style.display = "none";
 
         usuarioRecargaActual = data;
         uidActualRecarga = data.uid;
 
-        document.getElementById("recarga-usuario").textContent = data.nombreCompleto || data.usuario || "Usuario";
-        document.getElementById("recarga-saldo-actual").textContent = formatMoney(data.saldo || 0);
-        document.getElementById("recarga-uid-mostrado").textContent = data.uid || "--";
-        document.getElementById("recarga-estado").textContent = data.estado || "ACTIVA";
+        document.getElementById("recarga-usuario").textContent =
+          data.nombreCompleto || data.usuario || "Usuario";
+        document.getElementById("recarga-saldo-actual").textContent =
+          formatMoney(data.saldo || 0);
+        document.getElementById("recarga-uid-mostrado").textContent =
+          data.uid || "--";
+        document.getElementById("recarga-estado").textContent =
+          data.estado || "ACTIVA";
         panel.style.display = "block";
 
         setTimeout(() => {
@@ -911,17 +1029,34 @@
           uidActualCobro = "";
           panel.style.display = "none";
           actualizarResumen();
+
+          // Aviso solo si ya escribieron suficientes caracteres
+          if (uid.length >= 5) {
+            document.getElementById("aviso-cobro").textContent =
+              "Tarjeta no registrada o usuario inexistente.";
+            document.getElementById("aviso-cobro").style.display = "block";
+          } else {
+            document.getElementById("aviso-cobro").style.display = "none";
+          }
+
           return;
         }
+
+        // Si encontró usuario, oculta el aviso
+        document.getElementById("aviso-cobro").style.display = "none";
 
         usuarioCobroActual = data;
         saldoActual = parseFloat(data.saldo || 0);
         uidActualCobro = data.uid;
 
-        document.getElementById("cobro-usuario").textContent = data.nombreCompleto || data.usuario || "Usuario";
-        document.getElementById("cobro-saldo").textContent = formatMoney(saldoActual);
-        document.getElementById("cobro-uid-mostrado").textContent = data.uid || "--";
-        document.getElementById("cobro-estado").textContent = data.estado || "ACTIVA";
+        document.getElementById("cobro-usuario").textContent =
+          data.nombreCompleto || data.usuario || "Usuario";
+        document.getElementById("cobro-saldo").textContent =
+          formatMoney(saldoActual);
+        document.getElementById("cobro-uid-mostrado").textContent =
+          data.uid || "--";
+        document.getElementById("cobro-estado").textContent =
+          data.estado || "ACTIVA";
         panel.style.display = "block";
 
         actualizarResumen();
@@ -943,10 +1078,15 @@
 
           if (resStats.ok) {
             const stats = await resStats.json();
-            document.getElementById("stat-productos").innerText = stats.totalProductos || 0;
-            document.getElementById("stat-ventas").innerText = formatMoney(stats.totalSaldo || 0);
-            document.getElementById("stat-clientes").innerText = stats.totalEstudiantes || 0;
-            document.getElementById("stat-transacciones").innerText = stats.totalTransacciones || 0;
+            document.getElementById("stat-productos").innerText =
+              stats.totalProductos || 0;
+            document.getElementById("stat-ventas").innerText = formatMoney(
+              stats.totalSaldo || 0,
+            );
+            document.getElementById("stat-clientes").innerText =
+              stats.totalEstudiantes || 0;
+            document.getElementById("stat-transacciones").innerText =
+              stats.totalTransacciones || 0;
           }
 
           const resActividad = await fetch(`${API_URL}/transacciones`, {
@@ -988,7 +1128,8 @@
 
             const tipo = t.tipo || "COMPRA_BAR";
             const badge = tipo === "RECARGA" ? "bg-warning" : "bg-success";
-            const usuario = t.usuario?.nombreCompleto || t.usuario?.email || "Usuario";
+            const usuario =
+              t.usuario?.nombreCompleto || t.usuario?.email || "Usuario";
             const monto = Math.abs(t.monto || 0).toFixed(2);
 
             return `
@@ -1030,7 +1171,8 @@
         const tbody = document.getElementById("tabla-productos");
 
         if (!productos || productos.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" class="table-empty">No hay productos</td></tr>';
+          tbody.innerHTML =
+            '<tr><td colspan="7" class="table-empty">No hay productos</td></tr>';
           return;
         }
 
@@ -1059,13 +1201,19 @@
       }
 
       function renderStockBadge(stock) {
-        if (stock > 10) return '<span class="badge bg-success">Disponible: ' + stock + "</span>";
-        if (stock > 0) return '<span class="badge bg-warning">Bajo: ' + stock + "</span>";
+        if (stock > 10)
+          return (
+            '<span class="badge bg-success">Disponible: ' + stock + "</span>"
+          );
+        if (stock > 0)
+          return '<span class="badge bg-warning">Bajo: ' + stock + "</span>";
         return '<span class="badge bg-danger">Agotado</span>';
       }
 
       function buscarProductos() {
-        const busqueda = document.getElementById("buscarProducto").value.toLowerCase();
+        const busqueda = document
+          .getElementById("buscarProducto")
+          .value.toLowerCase();
 
         if (!busqueda) {
           mostrarProductos(productosData);
@@ -1099,10 +1247,12 @@
         document.getElementById("modal-titulo").textContent = "Editar producto";
         document.getElementById("producto-id").value = producto.id;
         document.getElementById("producto-nombre").value = producto.nombre;
-        document.getElementById("producto-descripcion").value = producto.descripcion || "";
+        document.getElementById("producto-descripcion").value =
+          producto.descripcion || "";
         document.getElementById("producto-precio").value = producto.precio;
         document.getElementById("producto-stock").value = producto.stock;
-        document.getElementById("producto-activo").checked = producto.activo !== false;
+        document.getElementById("producto-activo").checked =
+          producto.activo !== false;
         document.getElementById("modal-producto").style.display = "flex";
       }
 
@@ -1112,14 +1262,17 @@
         const id = document.getElementById("producto-id").value;
         const datos = {
           nombre: document.getElementById("producto-nombre").value,
-          descripcion: document.getElementById("producto-descripcion").value || "",
+          descripcion:
+            document.getElementById("producto-descripcion").value || "",
           precio: parseFloat(document.getElementById("producto-precio").value),
           stock: parseInt(document.getElementById("producto-stock").value),
           activo: document.getElementById("producto-activo").checked,
         };
 
         try {
-          const url = id ? `${API_URL}/productos/${id}` : `${API_URL}/productos`;
+          const url = id
+            ? `${API_URL}/productos/${id}`
+            : `${API_URL}/productos`;
           const method = id ? "PUT" : "POST";
 
           const res = await fetch(url, {
@@ -1167,7 +1320,9 @@
         event.preventDefault();
 
         const uid = sanitizeUid(document.getElementById("recarga-uid").value);
-        const monto = parseFloat(document.getElementById("recarga-monto").value);
+        const monto = parseFloat(
+          document.getElementById("recarga-monto").value,
+        );
 
         if (!uid || monto <= 0) {
           alert("Completa todos los campos");
@@ -1186,12 +1341,15 @@
           if (res.ok) {
             const data = await res.json();
 
-            alert(`Recarga exitosa\n\nNuevo saldo: ${formatMoney(data.nuevoSaldo)}`);
+            alert(
+              `Recarga exitosa\n\nNuevo saldo: ${formatMoney(data.nuevoSaldo)}`,
+            );
 
             document.getElementById("info-recarga").style.display = "block";
             document.getElementById("recarga-usuario").textContent =
               data.usuario || usuarioRecargaActual?.nombreCompleto || "Usuario";
-            document.getElementById("recarga-saldo-actual").textContent = formatMoney(data.nuevoSaldo || 0);
+            document.getElementById("recarga-saldo-actual").textContent =
+              formatMoney(data.nuevoSaldo || 0);
             document.getElementById("recarga-uid-mostrado").textContent = uid;
             document.getElementById("recarga-estado").textContent =
               usuarioRecargaActual?.estado || "ACTIVA";
@@ -1232,7 +1390,8 @@
           const tbody = document.getElementById("tabla-recargas-hoy");
 
           if (recargasHoy.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="table-empty">No hay recargas hoy</td></tr>';
+            tbody.innerHTML =
+              '<tr><td colspan="3" class="table-empty">No hay recargas hoy</td></tr>';
             return;
           }
 
@@ -1274,14 +1433,16 @@
         const grid = document.getElementById("grid-productos");
 
         if (!productos || productos.length === 0) {
-          grid.innerHTML = '<p class="table-empty">No hay productos disponibles</p>';
+          grid.innerHTML =
+            '<p class="table-empty">No hay productos disponibles</p>';
           return;
         }
 
         const visibles = productos.filter((p) => p.activo && p.stock > 0);
 
         if (visibles.length === 0) {
-          grid.innerHTML = '<p class="table-empty">No hay productos activos con stock</p>';
+          grid.innerHTML =
+            '<p class="table-empty">No hay productos activos con stock</p>';
           return;
         }
 
@@ -1305,16 +1466,30 @@
       function obtenerIconoProducto(nombre) {
         const n = (nombre || "").toLowerCase();
         if (n.includes("café") || n.includes("cafe")) return "coffee";
-        if (n.includes("jugo") || n.includes("te") || n.includes("té")) return "glass-whiskey";
-        if (n.includes("hamburguesa") || n.includes("seco") || n.includes("chaulafán") || n.includes("cubano")) return "hamburger";
-        if (n.includes("empanada") || n.includes("sandwich") || n.includes("sándwich")) return "bread-slice";
+        if (n.includes("jugo") || n.includes("te") || n.includes("té"))
+          return "glass-whiskey";
+        if (
+          n.includes("hamburguesa") ||
+          n.includes("seco") ||
+          n.includes("chaulafán") ||
+          n.includes("cubano")
+        )
+          return "hamburger";
+        if (
+          n.includes("empanada") ||
+          n.includes("sandwich") ||
+          n.includes("sándwich")
+        )
+          return "bread-slice";
         if (n.includes("galleta") || n.includes("pizza")) return "pizza-slice";
         if (n.includes("cola") || n.includes("refresco")) return "wine-bottle";
         return "utensils";
       }
 
       function filtrarProductosVenta() {
-        const busqueda = document.getElementById("buscar-producto-venta").value.toLowerCase();
+        const busqueda = document
+          .getElementById("buscar-producto-venta")
+          .value.toLowerCase();
         let filtrados = productosVenta.filter((p) => p.activo && p.stock > 0);
 
         if (busqueda) {
@@ -1387,8 +1562,12 @@
       }
 
       function actualizarResumen() {
-        const total = carritoCompra.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
-        document.getElementById("precio-total").textContent = formatMoney(total);
+        const total = carritoCompra.reduce(
+          (sum, item) => sum + item.precio * item.cantidad,
+          0,
+        );
+        document.getElementById("precio-total").textContent =
+          formatMoney(total);
 
         const saldoFinal = saldoActual - total;
         const saldoElem = document.getElementById("saldo-despues");
@@ -1410,13 +1589,18 @@
           return;
         }
 
-        const total = carritoCompra.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+        const total = carritoCompra.reduce(
+          (sum, item) => sum + item.precio * item.cantidad,
+          0,
+        );
         if (saldoActual < total) {
           alert("Saldo insuficiente para completar la compra");
           return;
         }
 
-        const productosIds = carritoCompra.flatMap((item) => Array(item.cantidad).fill(item.id));
+        const productosIds = carritoCompra.flatMap((item) =>
+          Array(item.cantidad).fill(item.id),
+        );
 
         try {
           const res = await fetch(`${API_URL}/tarjetas/compra`, {
@@ -1444,7 +1628,8 @@
             actualizarCarrito();
             actualizarResumen();
 
-            document.getElementById("cobro-saldo").textContent = formatMoney(saldoActual);
+            document.getElementById("cobro-saldo").textContent =
+              formatMoney(saldoActual);
             document.getElementById("cobro-uid").value = "";
             document.getElementById("info-cobro").style.display = "none";
 
@@ -1477,13 +1662,17 @@
 
           const ventasHoy = transacciones.filter((t) => {
             const fechaTrans = new Date(t.fecha).toISOString().split("T")[0];
-            return fechaTrans === hoy && (t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA");
+            return (
+              fechaTrans === hoy &&
+              (t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA")
+            );
           });
 
           const tbody = document.getElementById("tabla-ventas-hoy");
 
           if (ventasHoy.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No hay ventas hoy</td></tr>';
+            tbody.innerHTML =
+              '<tr><td colspan="4" class="table-empty">No hay ventas hoy</td></tr>';
             return;
           }
 
@@ -1512,7 +1701,9 @@
 
           if (res.ok) {
             todasLasTransacciones = await res.json();
-            todasLasTransacciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            todasLasTransacciones.sort(
+              (a, b) => new Date(b.fecha) - new Date(a.fecha),
+            );
             transaccionesFiltradas = [...todasLasTransacciones];
             paginaActual = 1;
             calcularEstadisticas();
@@ -1539,9 +1730,12 @@
         const balance = recargas - compras;
 
         document.getElementById("stat-total-transacciones").textContent = total;
-        document.getElementById("stat-recargas").textContent = formatMoney(recargas);
-        document.getElementById("stat-compras").textContent = formatMoney(compras);
-        document.getElementById("stat-balance").textContent = formatMoney(balance);
+        document.getElementById("stat-recargas").textContent =
+          formatMoney(recargas);
+        document.getElementById("stat-compras").textContent =
+          formatMoney(compras);
+        document.getElementById("stat-balance").textContent =
+          formatMoney(balance);
       }
 
       function mostrarTransacciones() {
@@ -1569,9 +1763,11 @@
 
             const tipo = t.tipo || "COMPRA_BAR";
             const badgeColor = tipo === "RECARGA" ? "bg-warning" : "bg-success";
-            const usuario = t.usuario?.nombreCompleto || t.usuario?.email || "Usuario";
+            const usuario =
+              t.usuario?.nombreCompleto || t.usuario?.email || "Usuario";
             const monto = Math.abs(t.monto || 0).toFixed(2);
-            const montoColor = tipo === "RECARGA" ? "text-success" : "text-danger";
+            const montoColor =
+              tipo === "RECARGA" ? "text-success" : "text-danger";
             const signo = tipo === "RECARGA" ? "+" : "-";
 
             return `
@@ -1596,12 +1792,18 @@
       }
 
       function filtrarTransacciones() {
-        const busqueda = document.getElementById("buscar-transaccion").value.toLowerCase();
+        const busqueda = document
+          .getElementById("buscar-transaccion")
+          .value.toLowerCase();
         const tipoFiltro = document.getElementById("filtro-tipo").value;
         const fechaFiltro = document.getElementById("filtro-fecha").value;
 
         transaccionesFiltradas = todasLasTransacciones.filter((t) => {
-          const usuario = (t.usuario?.nombreCompleto || t.usuario?.email || "").toLowerCase();
+          const usuario = (
+            t.usuario?.nombreCompleto ||
+            t.usuario?.email ||
+            ""
+          ).toLowerCase();
           const tipo = (t.tipo || "").toLowerCase();
           const monto = String(t.monto || 0);
           const detalle = (t.detalle || "").toLowerCase();
@@ -1645,32 +1847,50 @@
       }
 
       function actualizarPaginacion() {
-        const totalPaginas = Math.ceil(transaccionesFiltradas.length / transaccionesPorPagina);
-        const inicio = transaccionesFiltradas.length === 0 ? 0 : (paginaActual - 1) * transaccionesPorPagina + 1;
-        const fin = Math.min(inicio + transaccionesPorPagina - 1, transaccionesFiltradas.length);
+        const totalPaginas = Math.ceil(
+          transaccionesFiltradas.length / transaccionesPorPagina,
+        );
+        const inicio =
+          transaccionesFiltradas.length === 0
+            ? 0
+            : (paginaActual - 1) * transaccionesPorPagina + 1;
+        const fin = Math.min(
+          inicio + transaccionesPorPagina - 1,
+          transaccionesFiltradas.length,
+        );
 
         document.getElementById("info-paginacion").textContent =
           `Mostrando ${inicio} - ${fin < 0 ? 0 : fin} de ${transaccionesFiltradas.length} transacciones`;
 
-        document.getElementById("numero-pagina").textContent = `${paginaActual} / ${totalPaginas || 1}`;
+        document.getElementById("numero-pagina").textContent =
+          `${paginaActual} / ${totalPaginas || 1}`;
         document.getElementById("btn-anterior").disabled = paginaActual === 1;
-        document.getElementById("btn-siguiente").disabled = paginaActual >= totalPaginas || totalPaginas === 0;
+        document.getElementById("btn-siguiente").disabled =
+          paginaActual >= totalPaginas || totalPaginas === 0;
       }
 
       function cambiarPagina(direccion) {
-        const totalPaginas = Math.ceil(transaccionesFiltradas.length / transaccionesPorPagina);
+        const totalPaginas = Math.ceil(
+          transaccionesFiltradas.length / transaccionesPorPagina,
+        );
         paginaActual += direccion;
 
         if (paginaActual < 1) paginaActual = 1;
         if (paginaActual > totalPaginas) paginaActual = totalPaginas || 1;
 
         mostrarTransacciones();
-        document.getElementById("tabla-transacciones").scrollIntoView({ behavior: "smooth", block: "start" });
+        document
+          .getElementById("tabla-transacciones")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
       async function cargarReportes() {
-        const mes = parseInt(document.getElementById("selector-mes-reporte").value);
-        const anio = parseInt(document.getElementById("selector-anio-reporte").value);
+        const mes = parseInt(
+          document.getElementById("selector-mes-reporte").value,
+        );
+        const anio = parseInt(
+          document.getElementById("selector-anio-reporte").value,
+        );
 
         try {
           const res = await fetch(`${API_URL}/transacciones`, {
@@ -1707,10 +1927,14 @@
         const diasEnMes = new Date(anio, mes + 1, 0).getDate();
         const promedioDiario = diasEnMes > 0 ? ventas / diasEnMes : 0;
 
-        document.getElementById("reporte-ingresos").textContent = formatMoney(ingresos);
-        document.getElementById("reporte-ventas").textContent = formatMoney(ventas);
-        document.getElementById("reporte-transacciones").textContent = transacciones.length;
-        document.getElementById("reporte-promedio").textContent = formatMoney(promedioDiario);
+        document.getElementById("reporte-ingresos").textContent =
+          formatMoney(ingresos);
+        document.getElementById("reporte-ventas").textContent =
+          formatMoney(ventas);
+        document.getElementById("reporte-transacciones").textContent =
+          transacciones.length;
+        document.getElementById("reporte-promedio").textContent =
+          formatMoney(promedioDiario);
 
         generarGraficoVentasDiarias(transacciones, mes, anio);
         generarGraficoTipos(transacciones);
@@ -1723,8 +1947,10 @@
         document.getElementById("reporte-ventas").textContent = "$0.00";
         document.getElementById("reporte-transacciones").textContent = "0";
         document.getElementById("reporte-promedio").textContent = "$0.00";
-        document.getElementById("top-productos").innerHTML = '<p class="table-empty">No hay datos disponibles</p>';
-        document.getElementById("top-usuarios").innerHTML = '<p class="table-empty">No hay datos disponibles</p>';
+        document.getElementById("top-productos").innerHTML =
+          '<p class="table-empty">No hay datos disponibles</p>';
+        document.getElementById("top-usuarios").innerHTML =
+          '<p class="table-empty">No hay datos disponibles</p>';
         if (chartVentasDiarias) chartVentasDiarias.destroy();
         if (chartTipos) chartTipos.destroy();
       }
@@ -1740,11 +1966,16 @@
             ventasPorDia[dia - 1] += Math.abs(t.monto || 0);
           });
 
-        const labels = Array.from({ length: diasEnMes }, (_, i) => `Día ${i + 1}`);
+        const labels = Array.from(
+          { length: diasEnMes },
+          (_, i) => `Día ${i + 1}`,
+        );
 
         if (chartVentasDiarias) chartVentasDiarias.destroy();
 
-        const ctx = document.getElementById("grafico-ventas-diarias").getContext("2d");
+        const ctx = document
+          .getElementById("grafico-ventas-diarias")
+          .getContext("2d");
         chartVentasDiarias = new Chart(ctx, {
           type: "line",
           data: {
@@ -1786,8 +2017,12 @@
       }
 
       function generarGraficoTipos(transacciones) {
-        const recargas = transacciones.filter((t) => t.tipo === "RECARGA").length;
-        const compras = transacciones.filter((t) => t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA").length;
+        const recargas = transacciones.filter(
+          (t) => t.tipo === "RECARGA",
+        ).length;
+        const compras = transacciones.filter(
+          (t) => t.tipo === "COMPRA_BAR" || t.tipo === "COMPRA",
+        ).length;
 
         if (chartTipos) chartTipos.destroy();
 
@@ -1825,7 +2060,8 @@
             if (t.detalle) {
               const productos = t.detalle.split(",").map((p) => p.trim());
               productos.forEach((prod) => {
-                if (prod) productosVendidos[prod] = (productosVendidos[prod] || 0) + 1;
+                if (prod)
+                  productosVendidos[prod] = (productosVendidos[prod] || 0) + 1;
               });
             }
           });
@@ -1837,7 +2073,8 @@
         const contenedor = document.getElementById("top-productos");
 
         if (topProductos.length === 0) {
-          contenedor.innerHTML = '<p class="table-empty">No hay datos disponibles</p>';
+          contenedor.innerHTML =
+            '<p class="table-empty">No hay datos disponibles</p>';
           return;
         }
 
@@ -1865,7 +2102,8 @@
         const usuariosActividad = {};
 
         transacciones.forEach((t) => {
-          const usuario = t.usuario?.nombreCompleto || t.usuario?.email || "Desconocido";
+          const usuario =
+            t.usuario?.nombreCompleto || t.usuario?.email || "Desconocido";
           if (!usuariosActividad[usuario]) {
             usuariosActividad[usuario] = { transacciones: 0, total: 0 };
           }
@@ -1880,7 +2118,8 @@
         const contenedor = document.getElementById("top-usuarios");
 
         if (topUsuarios.length === 0) {
-          contenedor.innerHTML = '<p class="table-empty">No hay datos disponibles</p>';
+          contenedor.innerHTML =
+            '<p class="table-empty">No hay datos disponibles</p>';
           return;
         }
 
