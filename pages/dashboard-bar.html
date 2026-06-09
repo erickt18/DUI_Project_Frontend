@@ -1,12 +1,6 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <!-- =========================================================
-         CABECERA DEL DOCUMENTO
-         - Configuración base del HTML
-         - Librerías externas
-         - Hoja de estilos del módulo bar
-    ========================================================== -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Bar - CatoID</title>
@@ -23,16 +17,7 @@
   </head>
 
   <body>
-    <!-- =========================================================
-         LAYOUT PRINCIPAL
-         - Sidebar lateral
-         - Contenido principal
-    ========================================================== -->
     <div class="layout">
-      <!-- =======================================================
-           SIDEBAR
-           - Menú principal del módulo del bar
-      ======================================================== -->
       <aside class="sidebar">
         <div class="sidebar-brand">
           <h3><i class="fas fa-mug-hot"></i> BAR ADMINISTRACION</h3>
@@ -95,15 +80,7 @@
         </button>
       </aside>
 
-      <!-- =======================================================
-           CONTENIDO PRINCIPAL
-      ======================================================== -->
       <main class="main-content">
-        <!-- =====================================================
-             VISTA 1: DASHBOARD
-             - Resumen rápido
-             - Actividad reciente
-        ====================================================== -->
         <section id="view-dashboard" class="view-section active">
           <div class="header-dash">
             <div>
@@ -170,10 +147,6 @@
           </div>
         </section>
 
-        <!-- =====================================================
-             VISTA 2: PRODUCTOS
-             - CRUD visual de productos
-        ====================================================== -->
         <section id="view-productos" class="view-section">
           <div class="header-dash">
             <div>
@@ -225,18 +198,16 @@
           </div>
         </section>
 
-        <!-- =====================================================
-             VISTA 3: RECARGAR SALDO
-             - Escaneo RFID/NFC
-             - Mostrar datos del usuario
-             - Procesar recarga sin tocar la BD directamente
-        ====================================================== -->
         <section id="view-recargar-saldo" class="view-section">
           <div class="header-dash">
             <div>
               <h1><i class="fas fa-wallet"></i> Recargar saldo</h1>
               <p>Pasa la tarjeta o celular y luego registra el monto.</p>
             </div>
+            <button class="btn-primary btn-qr-sim" onclick="abrirModalQR()">
+              <i class="fas fa-qrcode"></i>
+              <span>Simular QR</span>
+            </button>
           </div>
 
           <div class="grid-two">
@@ -260,7 +231,6 @@
                     oninput="verificarTarjetaRecarga()"
                   />
                 </div>
-                <!-- AVISO: usuario no encontrado -->
                 <div
                   id="aviso-recarga"
                   style="
@@ -363,12 +333,6 @@
           </div>
         </section>
 
-        <!-- =====================================================
-             VISTA 4: COBRAR CON RFID / NFC
-             - Detecta usuario
-             - Muestra saldo
-             - Permite agregar productos y cobrar
-        ====================================================== -->
         <section id="view-cobrar-rfid" class="view-section">
           <div class="header-dash">
             <div>
@@ -378,6 +342,10 @@
                 disponible.
               </p>
             </div>
+            <button class="btn-primary btn-qr-sim" onclick="abrirModalQR()">
+              <i class="fas fa-qrcode"></i>
+              <span>Simular QR</span>
+            </button>
           </div>
 
           <div class="grid-two purchase-layout">
@@ -397,7 +365,6 @@
                   oninput="verificarTarjetaCobro()"
                 />
               </div>
-              <!-- AVISO: usuario no encontrado -->
               <div
                 id="aviso-cobro"
                 style="
@@ -520,12 +487,6 @@
           </div>
         </section>
 
-        <!-- =====================================================
-             VISTA 5: TRANSACCIONES
-             - Tabla general
-             - Filtros
-             - Paginación
-        ====================================================== -->
         <section id="view-transacciones" class="view-section">
           <div class="header-dash">
             <div>
@@ -642,12 +603,6 @@
           </div>
         </section>
 
-        <!-- =====================================================
-             VISTA 6: REPORTES
-             - Indicadores
-             - Gráficos
-             - Ranking de productos y usuarios
-        ====================================================== -->
         <section id="view-reportes" class="view-section">
           <div class="header-dash">
             <div>
@@ -749,10 +704,24 @@
       </main>
     </div>
 
-    <!-- =========================================================
-         MODAL DE PRODUCTOS
-         - Crear o editar producto
-    ========================================================== -->
+    <div id="modal-qr-simulacion" class="modal-overlay">
+      <div class="modal-box modal-qr-box">
+        <div class="modal-header">
+          <h2>Simulador Código QR</h2>
+          <button class="modal-close" onclick="cerrarModalQR()">&times;</button>
+        </div>
+        <div class="modal-qr-body">
+          <p>Presenta este código QR frente a la cámara web o simulador de lectura para validar los datos:</p>
+          <img src="../assets/img/codigoQR.png" alt="Código QR Simulación" class="qr-img-file" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary full-width" onclick="cerrarModalQR()">
+            <i class="fas fa-times"></i> Cerrar Ventana
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div id="modal-producto" class="modal-overlay">
       <div class="modal-box">
         <div class="modal-header">
@@ -815,12 +784,6 @@
       </div>
     </div>
 
-    <!-- =========================================================
-         JAVASCRIPT PRINCIPAL
-         - Conserva los endpoints actuales
-         - Mejora enfoque RFID/NFC
-         - Corrige variables de saldo
-    ========================================================== -->
     <script>
       const API_URL = "http://localhost:8080/api";
       const token = localStorage.getItem("jwt_token");
@@ -846,6 +809,9 @@
 
       let chartVentasDiarias = null;
       let chartTipos = null;
+
+      // Guarda la vista activa actual globalmente para regresar el foco al cerrarse el modal QR
+      let vistaActivaGlobal = "dashboard";
 
       function formatMoney(value) {
         return "$" + Number(value || 0).toFixed(2);
@@ -879,7 +845,19 @@
         }, 150);
       }
 
+      /* FUNCIONES DE CONTROL PARA EL MODAL DEL QR (AÑADIDAS) */
+      function abrirModalQR() {
+        document.getElementById("modal-qr-simulacion").style.display = "flex";
+      }
+
+      function cerrarModalQR() {
+        document.getElementById("modal-qr-simulacion").style.display = "none";
+        // Al cerrar el QR devolvemos automáticamente el foco al input activo según la pestaña abierta
+        enfocarInputPorVista(vistaActivaGlobal);
+      }
+
       function cambiarVista(vistaNombre, elementoMenu) {
+        vistaActivaGlobal = vistaNombre; // Almacena el estado de vista actual
         document
           .querySelectorAll(".view-section")
           .forEach((el) => el.classList.remove("active"));

@@ -1092,3 +1092,49 @@ td:last-child {
     align-items: stretch;
   }
 }
+
+/* =========================================================
+   ESTILOS ADICIONALES PARA LA SIMULACIÓN QR
+========================================================= */
+.btn-qr-sim {
+  background: linear-gradient(135deg, var(--ucacue-gold) 0%, #917505 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-qr-sim:hover {
+  background: linear-gradient(135deg, #917505 0%, #6e5802 100%);
+  box-shadow: 0 8px 18px rgba(184, 150, 12, 0.25);
+}
+
+.modal-qr-box {
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-qr-body {
+  padding: 10px 0 20px;
+}
+
+.modal-qr-body p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+
+.qr-img-file {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  padding: 12px;
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.03);
+  transition: var(--transition);
+}
+
+.qr-img-file:hover {
+  border-color: var(--ucacue-gold);
+  transform: scale(1.02);
+}
